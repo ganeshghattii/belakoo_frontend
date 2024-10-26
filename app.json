@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Belakoo",
+    "slug": "Belakoo",
+    "scheme": "belakoo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/customicon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splashcustom.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ganeshghattitest.Belakoo"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/customadaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.ganeshghattitest.Belakoo"
+    },
+    "web": {
+      "favicon": "./assets/customfavicon.png"
+    },
+    "plugins": ["expo-font", "expo-router"]
+  }
+}

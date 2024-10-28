@@ -1,7 +1,7 @@
 import axios from "axios";
 import authService from "./authService";
 
-const API_URL = "https://belakoo-backend.onrender.com"; // Replace with your actual backend URL
+const API_URL = "https://belakoo-backend-02sy.onrender.com"; // Replace with your actual backend URL
 
 const api = axios.create({
   baseURL: API_URL,

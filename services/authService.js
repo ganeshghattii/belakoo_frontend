@@ -2,7 +2,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 
-const API_URL = "https://belakoo-backend.onrender.com"; // For Android emulator
+const API_URL = "https://belakoo-backend-02sy.onrender.com"; // For Android emulator
 
 const authService = {
   login: async (email, password) => {

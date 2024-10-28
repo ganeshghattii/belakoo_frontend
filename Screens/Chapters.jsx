@@ -33,7 +33,7 @@ const Chapters = () => {
   const fetchGradeDetails = async () => {
     try {
       const response = await api.get(
-        `https://belakoo-backend.onrender.com/api/proficiencies/${proficiencyId}/lessons/`
+        `/api/proficiencies/${proficiencyId}/lessons/`
       );
       setChapters(response.data.lessons);
       setIsLoading(false);

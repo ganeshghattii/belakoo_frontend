@@ -19,7 +19,7 @@ import { useRouter } from "expo-router";
 import CustomSafeAreaView from "../Components/CustomSafeAreaView";
 
 const Subjects = () => {
-  const { campusId } = useLocalSearchParams();
+  const { gradeId } = useLocalSearchParams();
   const [campusData, setCampusData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -30,7 +30,7 @@ const Subjects = () => {
 
   const fetchCampusDetails = async () => {
     try {
-      const response = await api.get(`/api/campuses/${campusId}/`);
+      const response = await api.get(`/api/grades/${gradeId}/`);
       setCampusData(response.data);
       setIsLoading(false);
     } catch (error) {

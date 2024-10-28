@@ -73,7 +73,7 @@ const Campus = () => {
                     <Link
                       key={campus.id}
                       href={{
-                        pathname: "/subjects",
+                        pathname: "/grades",
                         params: { campusId: campus.id },
                       }}
                       asChild

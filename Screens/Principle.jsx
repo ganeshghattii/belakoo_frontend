@@ -27,7 +27,7 @@ const Principle = () => {
 
   const handleMarkAsDone = async () => {
     const response = axios.post(
-      `https://belakoo-backend.onrender.com/api/lessons/${lessonCode}/mark-done/`
+      `https://belakoo-backend-02sy.onrender.com/api/lessons/${lessonCode}/mark-done/`
     );
     router.push({
       pathname: `/chapters`,

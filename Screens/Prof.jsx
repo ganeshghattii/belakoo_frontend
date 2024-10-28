@@ -11,23 +11,18 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import CustomSafeAreaView from "../Components/CustomSafeAreaView";
-import CustomHeader from "../Components/CustomHeader";
-import TitleContainer from "../Components/TitleContainer";
-import { AntDesign } from "@expo/vector-icons";
 import api from "../services/api";
-import Toast from "react-native-toast-message";
+
 
 import { Link } from "expo-router";
 
-const Grades = () => {
-  const { campusId } = useLocalSearchParams();
+const Prof = () => {
+  const { subjectId, subjectName } = useLocalSearchParams();
 
   const router = useRouter();
-  const [grades, setGrades] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  const [gradeTab, setGradeTab] = useState(false);
-  const [proficiencyTab, setProficiencyTab] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [profTab, setProfTab] = useState(false);
 
   const [prof, setProf] = useState([]);
   const [isprof, setIsProf] = useState(false);
@@ -35,37 +30,25 @@ const Grades = () => {
   const [selectGrade, setSelectGrade] = useState();
 
   useEffect(() => {
-    fetchGrades();
+    fetchProf();
   }, []);
 
-  const fetchGrades = async () => {
+
+
+  const fetchProf = async () => {
     try {
-      const response = await api.get(`/api/campuses/${campusId}/`);
-      setGrades(response.data.grades);
-      setIsLoading(false);
+      const response = await api.get(
+        `https://belakoo-backend-02sy.onrender.com/api/subjects/${subjectId}/`
+      );
+      setProf(response.data.proficiencies);
+      setIsProf(true);
+      setProfTab(true)
+      setIsLoading(false)
+      setSelectGrade(subjectName);
     } catch (error) {
-      console.error("Error fetching grades:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to load grades. Please try again.",
-      });
-      setIsLoading(false);
+      console.error("Error fetching Proficiency", error);
     }
   };
-
-  // const fetchProf = async (id, name) => {
-  //   try {
-  //     const response = await api.get(
-  //       `https://belakoo-backend.onrender.com/api/grades/${id}/`
-  //     );
-  //     setProf(response.data.proficiencies);
-  //     setIsProf(true);
-  //     setSelectGrade(name);
-  //   } catch (error) {
-  //     console.error("Error fetching Proficiency");
-  //   }
-  // };
 
   return (
     <CustomSafeAreaView>
@@ -80,7 +63,7 @@ const Grades = () => {
      
           </TouchableOpacity>
             <Text className="text-2xl font-bold text-white">
-              Select the Grade
+              Select the Proficiency
             </Text>
           </View>
           {isLoading ? (
@@ -96,26 +79,29 @@ const Grades = () => {
                 className="bg-white  w-64 h-16 flex items-center justify-center border border-white rounded-xl"
               >
                 <Text className="text-[#F56E00] font-semibold text-2xl">
-                  {!selectGrade ? "Select" : selectGrade}
+                  Select
                 </Text>
               </TouchableOpacity>
 
-              {gradeTab && (
+              {profTab && (
                 <ScrollView
                   className="bg-white border mt-5 rounded-lg border-white h-36"
                   showsVerticalScrollIndicator={false}
                 >
-                  {grades.map((grade) => (
-                    <Link href={{
-                      pathname : "/subjects",
-                      params: { gradeId: grade.id },
-                    }} asChild>
+                  {prof.map((prof) => (
+                    <Link key={prof.id} href={{
+                        pathname: "/chapters",
+                        params: {
+                            proficiencyId: prof.id,
+                            proficiencyName: prof.name,
+                            },
+                        }} asChild>
                     <TouchableOpacity
-                      key={grade.id}
+                      key={prof.id}
                       className="bg-white border-b border-b-black/10 mb-2 w-64 h-16 flex items-center justify-center rounded-xl"
                     >
                       <Text className="text-black font-semibold text-2xl">
-                        {grade.name}
+                        {prof.name}
                       </Text>
                     </TouchableOpacity>
                     </Link>
@@ -176,4 +162,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Grades;
+export default Prof;

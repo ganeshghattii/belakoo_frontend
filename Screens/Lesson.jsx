@@ -37,7 +37,7 @@ const Lesson = () => {
   const fetchLessonDetails = async () => {
     try {
       const response = await api.get(
-        `https://belakoo-backend.onrender.com/api/lessons/${lessonCode}/`
+        `/api/lessons/${lessonCode}/`
       );
       setLessonData(response.data);
       setIsLoading(false);

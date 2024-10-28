@@ -34,7 +34,7 @@ const Activate = () => {
   const fetchLessonDetails = async () => {
     try {
       const response = await api.get(
-        `https://belakoo-backend.onrender.com/api/lessons/${lessonCode}/`
+        `https://belakoo-backend-02sy.onrender.com/api/lessons/${lessonCode}/`
       );
       console.log(response.data);
       setActivateData(response.data.activate);

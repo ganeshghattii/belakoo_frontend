@@ -137,7 +137,7 @@ const Lesson = () => {
                     },
                   })
                 }
-                className="bg-[#F56E00] py-2 mx-10 flex border-[#F56E00] items-center justify-center border rounded-3xl"
+                className="bg-[#F56E00] py-2 mx-10 mb-10 flex border-[#F56E00] items-center justify-center border rounded-3xl"
               >
                 <Text className="text-white font-bold text-xl">Next</Text>
               </TouchableOpacity>

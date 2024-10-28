@@ -61,7 +61,7 @@ const Instruction = () => {
               ))}
               <TouchableOpacity
                 onPress={handleRedirect}
-                className="bg-[#F56E00] py-2 mx-10 flex border-[#F56E00] items-center justify-center border rounded-3xl"
+                className="bg-[#F56E00] py-2 mx-10 flex mb-10 border-[#F56E00] items-center justify-center border rounded-3xl"
               >
                 <Text className="text-white font-bold text-xl">Next</Text>
               </TouchableOpacity>

@@ -78,7 +78,7 @@ const Campus = () => {
                       }}
                       asChild
                     >
-                      <TouchableOpacity className="bg-white rounded-xl shadow-xl border border-white px-8 py-16">
+                      <TouchableOpacity className="bg-white  rounded-xl shadow-xl border border-white w-44 py-16">
                         <Text className="text-[#F56E00] text-2xl font-bold text-center">
                           {campus.name}
                         </Text>
@@ -132,11 +132,13 @@ const styles = StyleSheet.create({
   cardContainer: {
     flexDirection: "row",
     marginTop: 0,
+
+
     justifyContent: "space-around",
     width: "100%",
   },
   campusCard: {
-    width: "45%",
+    width: "30%",
     paddingVertical: 12,
     paddingHorizontal: 20,
     rowGap: 10,

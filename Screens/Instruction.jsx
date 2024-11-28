@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, StyleSheet, ImageBackground, Image } from "react-native";
 
 import { Text } from "react-native";
@@ -12,6 +12,10 @@ import { InstructionContentData } from "../constant";
 import { TouchableOpacity } from "react-native";
 
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
+
+import useStore from "../store";
 
 const InstructionContent = ({ title, description }) => {
   return (
@@ -24,6 +28,26 @@ const InstructionContent = ({ title, description }) => {
 
 const Instruction = () => {
   const router = useRouter();
+  const { setUserRole, userRole } = useStore();
+
+  const isAdmin = userRole === "ADMIN";
+
+  const decodeToken = async () => {
+    const token = await AsyncStorage.getItem("userToken");
+
+    try {
+      const decodedToken = jwtDecode(token);
+      console.log(decodedToken.role);
+      setUserRole(decodedToken.role);
+      console.log(isAdmin);
+    } catch (error) {
+      console.error("Invalid JWT:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    decodeToken();
+  }, []);
 
   const handleRedirect = async () => {
     router.replace("/campus");
@@ -37,10 +61,15 @@ const Instruction = () => {
           style={styles.background}
         >
           <View className="flex relative items-center justify-center flex-row bg-[#F56E00] py-5 mt-0">
-          <TouchableOpacity className="absolute left-0 ml-5" onPress={() => router.back()}>
-          <Image source={require("../assets/arrow.png")}  className="w-9 h-7"/>
-     
-          </TouchableOpacity>
+            <TouchableOpacity
+              className="absolute left-0 ml-5"
+              onPress={() => router.back()}
+            >
+              <Image
+                source={require("../assets/arrow.png")}
+                className="w-9 h-7"
+              />
+            </TouchableOpacity>
             <Text className="text-2xl font-bold text-white">
               Read the Instructions
             </Text>

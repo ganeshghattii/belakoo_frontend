@@ -18,11 +18,15 @@ import Toast from "react-native-toast-message";
 import { useRouter } from "expo-router";
 import CustomSafeAreaView from "../Components/CustomSafeAreaView";
 
+import useStore from "../store";
+
 const Subjects = () => {
   const { gradeId } = useLocalSearchParams();
   const [campusData, setCampusData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+
+  const { setValue } = useStore();
 
   useEffect(() => {
     fetchCampusDetails();
@@ -33,6 +37,7 @@ const Subjects = () => {
       const response = await api.get(`/api/grades/${gradeId}/`);
       setCampusData(response.data);
       setIsLoading(false);
+      setValue(gradeId);
     } catch (error) {
       console.error("Error fetching campus details:", error);
       console.error("Error response:", error.response?.data);
@@ -61,10 +66,15 @@ const Subjects = () => {
           ) : (
             <>
               <View className="flex relative items-center justify-center flex-row bg-[#F56E00] py-5 mt-0">
-              <TouchableOpacity className="absolute left-0 ml-5" onPress={() => router.back()}>
-          <Image source={require("../assets/arrow.png")}  className="w-9 h-7"/>
-     
-          </TouchableOpacity>
+                <TouchableOpacity
+                  className="absolute left-0 ml-5"
+                  onPress={() => router.back()}
+                >
+                  <Image
+                    source={require("../assets/arrow.png")}
+                    className="w-9 h-7"
+                  />
+                </TouchableOpacity>
                 <Text className="text-2xl font-bold text-white">
                   Choose your Subjects
                 </Text>

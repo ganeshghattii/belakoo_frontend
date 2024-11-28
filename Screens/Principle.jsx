@@ -15,10 +15,10 @@ import { MyContext } from "../context/context";
 const Principle = () => {
   const router = useRouter();
 
-  const { lessonCode, lessonName, activate, apply, assess, acquire } =
+  const { lessonCode, lessonName, lessonId, activate, apply, assess, acquire } =
     useLocalSearchParams();
 
-    const {profId} = useContext(MyContext)
+  const { profId } = useContext(MyContext);
 
   const [isActivate] = useState(activate);
   const [isAcquire] = useState(acquire);
@@ -35,7 +35,7 @@ const Principle = () => {
         lessonCode: lessonCode,
         lessonName: lessonName,
         activate: true,
-        proficiencyId : profId
+        proficiencyId: profId,
       },
     });
   };
@@ -47,6 +47,7 @@ const Principle = () => {
         params: {
           lessonCode: lessonCode,
           lessonName: lessonName,
+          lessonId: lessonId,
           activate: true,
         },
       });
@@ -60,6 +61,7 @@ const Principle = () => {
         params: {
           lessonCode: lessonCode,
           lessonName: lessonName,
+          lessonId: lessonId,
           activate: true,
         },
       });
@@ -73,6 +75,7 @@ const Principle = () => {
         params: {
           lessonCode: lessonCode,
           lessonName: lessonName,
+          lessonId: lessonId,
           activate: true,
         },
       });
@@ -81,14 +84,14 @@ const Principle = () => {
 
   const handleAssess = () => {
     if (isAssess) {
-      console.log(profId)
+      console.log(profId);
       router.push({
         pathname: `/assess`,
         params: {
           lessonCode: lessonCode,
           lessonName: lessonName,
+          lessonId: lessonId,
           activate: true,
-          
         },
       });
     }
@@ -98,9 +101,14 @@ const Principle = () => {
     <CustomSafeAreaView>
       <View style={styles.content} className="">
         <View className="flex relative items-center justify-center flex-row bg-[#F56E00] py-5 mt-0">
-        <TouchableOpacity className="absolute left-0 ml-5" onPress={() => router.back()}>
-          <Image source={require("../assets/arrow.png")}  className="w-9 h-7"/>
-     
+          <TouchableOpacity
+            className="absolute left-0 ml-5"
+            onPress={() => router.back()}
+          >
+            <Image
+              source={require("../assets/arrow.png")}
+              className="w-9 h-7"
+            />
           </TouchableOpacity>
           <Text className="text-2xl font-bold text-white">
             Guiding Principles
@@ -158,6 +166,7 @@ const Principle = () => {
                 params: {
                   lessonCode: lessonCode,
                   lessonName: lessonName,
+                  lessonId: lessonId,
                   activate: true,
                 },
               })

@@ -4,8 +4,11 @@ import {
   StyleSheet,
   ImageBackground,
   Image,
+  TextInput,
   TouchableOpacity,
 } from "react-native";
+
+import useStore from "../store";
 
 import { useEffect } from "react";
 
@@ -25,21 +28,38 @@ import { ScrollView } from "react-native";
 const Lesson = () => {
   const router = useRouter();
 
-  const { lessonCode, lessonName } = useLocalSearchParams();
+  const { lessonCode, lessonName, lessonId } = useLocalSearchParams();
   const [isLoading, setIsLoading] = useState(true);
 
   const [lessonData, setLessonData] = useState();
+  const [isEditing, setIsEditing] = useState(false);
 
-  useEffect(() => {
-    fetchLessonDetails();
-  }, []);
+  const [objective, setObjective] = useState();
+  const [duration, setDuration] = useState();
+  const [outcome, setOutcome] = useState();
+  const [behaviourOutcome, setBehaviourOutcome] = useState();
+  const [materialRequired, setMaterialRequired] = useState();
+
+  const { setLessonId } = useStore();
+
+  const { userRole } = useStore();
+  const isAdmin = userRole === "ADMIN";
+
+  const handleEditing = () => {
+    setIsEditing(true);
+    updateLessonData();
+  };
 
   const fetchLessonDetails = async () => {
     try {
-      const response = await api.get(
-        `/api/lessons/${lessonCode}/`
-      );
+      const response = await api.get(`/api/lessons/${lessonId}/`);
       setLessonData(response.data);
+      setObjective(response.data.objective);
+      setDuration(response.data.duration);
+      setLessonId(lessonId);
+      setOutcome(response.data.specific_learning_outcome);
+      setBehaviourOutcome(response.data.behavioral_outcome);
+      setMaterialRequired(response.data.materials_required);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching lesson details:", error);
@@ -53,13 +73,49 @@ const Lesson = () => {
     }
   };
 
+  const updateLessonData = async () => {
+    try {
+      const formData = {
+        objective,
+        duration,
+        specific_learning_outcome: outcome,
+        behavioral_outcome: behaviourOutcome,
+        materials_required: materialRequired,
+      };
+      console.log(formData);
+
+      const response = api.put(`admin-api/lesson/${lessonId}/`, formData);
+      setIsEditing(false);
+      console.log(response.data);
+
+      console.log(formData);
+    } catch (error) {
+      console.error("Error updating lesson:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to update lesson. Please try again.",
+      });
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLessonDetails();
+  }, []);
+
   return (
     <CustomSafeAreaView>
       <View style={styles.content} className="">
         <View className="flex relative items-center justify-center flex-row bg-[#F56E00] py-5 mt-0">
-        <TouchableOpacity className="absolute left-0 ml-5" onPress={() => router.back()}>
-          <Image source={require("../assets/arrow.png")}  className="w-9 h-7"/>
-     
+          <TouchableOpacity
+            className="absolute left-0 ml-5"
+            onPress={() => router.back()}
+          >
+            <Image
+              source={require("../assets/arrow.png")}
+              className="w-9 h-7"
+            />
           </TouchableOpacity>
           <Text className="text-2xl font-bold text-white">
             Belakube Lesson Plan
@@ -91,41 +147,105 @@ const Lesson = () => {
                 <Text className="text-xl font-bold text-[#F56E00]">
                   Objective
                 </Text>
-                <Text className="text-lg font-medium">
-                  {lessonData?.objective}
-                </Text>
+                {isEditing ? (
+                  <TextInput
+                    placeholder="enter your objective"
+                    placeholderTextColor="#CCCCCC"
+                    value={objective}
+                    keyboardType="email-address"
+                    clearButtonMode="while-editing"
+                    onChangeText={(text) => setObjective(text)}
+                    multiline={true}
+                    autoCapitalize="none"
+                    className="bg-white text-lg p-2 rounded-xl border-[#F56E00] border-2"
+                  />
+                ) : (
+                  <Text className="text-lg font-medium">{objective}</Text>
+                )}
               </View>
               <View className="bg-[#FFE4CF] p-5 border border-[#FFE4CF] rounded-3xl space-y-2">
                 <Text className="text-xl font-bold text-[#F56E00]">
                   Duration
                 </Text>
-                <Text className="text-lg font-medium">
-                  {lessonData?.duration}
-                </Text>
+                {isEditing ? (
+                  <TextInput
+                    placeholder="enter your objective"
+                    placeholderTextColor="#CCCCCC"
+                    value={duration}
+                    keyboardType="email-address"
+                    clearButtonMode="while-editing"
+                    onChangeText={(text) => setDuration(text)}
+                    multiline={true}
+                    autoCapitalize="none"
+                    className="bg-white text-lg p-2 rounded-xl border-[#F56E00] border-2"
+                  />
+                ) : (
+                  <Text className="text-lg font-medium">{duration}</Text>
+                )}
               </View>
               <View className="bg-[#FFE4CF] p-5 border border-[#FFE4CF] rounded-3xl space-y-2">
                 <Text className="text-xl font-bold text-[#F56E00]">
                   Specific Learning Outcome
                 </Text>
-                <Text className="text-lg font-medium">
-                  {lessonData?.specific_learning_outcome}
-                </Text>
+                {isEditing ? (
+                  <TextInput
+                    placeholder="enter your learning outcome"
+                    placeholderTextColor="#CCCCCC"
+                    value={outcome}
+                    keyboardType="email-address"
+                    clearButtonMode="while-editing"
+                    onChangeText={(text) => setOutcome(text)}
+                    multiline={true}
+                    autoCapitalize="none"
+                    className="bg-white text-lg p-2 rounded-xl border-[#F56E00] border-2"
+                  />
+                ) : (
+                  <Text className="text-lg font-medium">{outcome}</Text>
+                )}
               </View>
               <View className="bg-[#FFE4CF] p-5 border border-[#FFE4CF] rounded-3xl space-y-2">
                 <Text className="text-xl font-bold text-[#F56E00]">
                   Behavioural Outcome
                 </Text>
-                <Text className="text-lg font-medium">
-                  {lessonData?.behavioural_outcome}
-                </Text>
+                {isEditing ? (
+                  <TextInput
+                    placeholder="enter your objective"
+                    placeholderTextColor="#CCCCCC"
+                    value={behaviourOutcome}
+                    keyboardType="email-address"
+                    clearButtonMode="while-editing"
+                    onChangeText={(text) => setBehaviourOutcome(text)}
+                    multiline={true}
+                    autoCapitalize="none"
+                    className="bg-white text-lg p-2 rounded-xl border-[#F56E00] border-2"
+                  />
+                ) : (
+                  <Text className="text-lg font-medium">
+                    {behaviourOutcome}
+                  </Text>
+                )}
               </View>
               <View className="bg-[#FFE4CF] p-5 border border-[#FFE4CF] rounded-3xl space-y-2">
                 <Text className="text-xl font-bold text-[#F56E00]">
                   Materials Required
                 </Text>
-                <Text className="text-lg font-medium">
-                  {lessonData?.materials_required}
-                </Text>
+                {isEditing ? (
+                  <TextInput
+                    placeholder="enter your objective"
+                    placeholderTextColor="#CCCCCC"
+                    value={materialRequired}
+                    keyboardType="email-address"
+                    clearButtonMode="while-editing"
+                    onChangeText={(text) => setMaterialRequired(text)}
+                    multiline={true}
+                    autoCapitalize="none"
+                    className="bg-white text-lg p-2 rounded-xl border-[#F56E00] border-2"
+                  />
+                ) : (
+                  <Text className="text-lg font-medium">
+                    {materialRequired}
+                  </Text>
+                )}
               </View>
               <TouchableOpacity
                 onPress={() =>
@@ -134,13 +254,46 @@ const Lesson = () => {
                     params: {
                       lessonCode: lessonCode,
                       lessonName: lessonName,
+                      lessonId: lessonId,
                     },
                   })
                 }
-                className="bg-[#F56E00] py-2 mx-10 mb-10 flex border-[#F56E00] items-center justify-center border rounded-3xl"
+                className="bg-[#F56E00] py-2 mx-10  flex border-[#F56E00] items-center justify-center border rounded-3xl"
               >
                 <Text className="text-white font-bold text-xl">Next</Text>
               </TouchableOpacity>
+              {isAdmin &
+              (
+                <View>
+                  {isEditing ? (
+                    <TouchableOpacity
+                      onPress={() => handleEditing()}
+                      className="bg-[#F56E00] py-2 mx-10 mb-10 flex border-[#F56E00] items-center justify-center border rounded-3xl"
+                    >
+                      <Text className="text-white font-bold text-xl">
+                        Submit Changes
+                      </Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() => setIsEditing(!isEditing)}
+                      className="bg-[#F56E00] py-2 mx-10 mb-10 flex border-[#F56E00] items-center justify-center border rounded-3xl"
+                    >
+                      <Text className="text-white font-bold text-xl">
+                        Edit Lesson Plan
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                  <TouchableOpacity
+                    onPress={() => setIsEditing(!isEditing)}
+                    className="bg-[#F56E00] py-2 mx-10 mb-10 flex border-[#F56E00] items-center justify-center border rounded-3xl"
+                  >
+                    <Text className="text-white font-bold text-xl">
+                      Edit Lesson Plan
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </ScrollView>
           </View>
         )}

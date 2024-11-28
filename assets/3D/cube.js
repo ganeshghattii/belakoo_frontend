@@ -8,12 +8,12 @@ import { TextureLoader } from "three";
 // Function to convert Google Drive link to direct image link
 const getDirectImageUrl = (driveUrl) => {
   const fileId = driveUrl.match(/[-\w]{25,}/);
-  return fileId 
+  return fileId
     ? `https://drive.google.com/uc?export=view&id=${fileId[0]}`
     : driveUrl;
 };
 
-const CubeComponent = ({ subjects = [] }) => {
+const CubeComponent = ({ subjects = [], gradeId }) => {
   const router = useRouter();
   const mesh = useRef(null);
 
@@ -64,10 +64,11 @@ const CubeComponent = ({ subjects = [] }) => {
       const selectedSubject = subjects[faceIndex];
       router.push({
         pathname: "/prof",
-        params: { 
+        params: {
           subjectId: selectedSubject.id,
-          subjectName: selectedSubject.name
-        }
+          subjectName: selectedSubject.name,
+          gradeId: gradeId,
+        },
       });
     }
   };
@@ -80,7 +81,7 @@ const CubeComponent = ({ subjects = [] }) => {
           key={index}
           map={texture}
           attach={`material-${index}`}
-          color={texture ? undefined : 'red'} // Fallback color if texture fails to load
+          color={texture ? undefined : "red"} // Fallback color if texture fails to load
         />
       ))}
     </mesh>
@@ -88,7 +89,6 @@ const CubeComponent = ({ subjects = [] }) => {
 };
 
 const Cube = ({ subjects }) => {
-
   return (
     <View style={styles.container}>
       <Canvas style={styles.canvas}>

@@ -4,6 +4,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  TextInput,
   ImageBackground,
   Image,
   ActivityIndicator,
@@ -18,6 +19,11 @@ import api from "../services/api";
 import Toast from "react-native-toast-message";
 
 import { Link } from "expo-router";
+
+import Icon from "react-native-vector-icons/AntDesign";
+import Icon2 from "react-native-vector-icons/FontAwesome";
+
+import useStore from "../store";
 
 const Grades = () => {
   const { campusId } = useLocalSearchParams();
@@ -34,9 +40,31 @@ const Grades = () => {
 
   const [selectGrade, setSelectGrade] = useState();
 
+  const [isEditing, setIsEditing] = useState();
+  const [isCreating, setIsCreating] = useState();
+
+  const [grade_code, setGradeCode] = useState();
+  const [name, setName] = useState();
+  const [id, setId] = useState();
+
+  const { userRole } = useStore();
+  const isAdmin = userRole === "ADMIN";
+
   useEffect(() => {
     fetchGrades();
   }, []);
+
+  const handleEditing = (id) => {
+    setIsEditing(true);
+    setId(id);
+  };
+
+  const handleNavigation = (id) => {
+    router.push({
+      pathname: "/subjects",
+      params: { gradeId: id },
+    });
+  };
 
   const fetchGrades = async () => {
     try {
@@ -49,6 +77,73 @@ const Grades = () => {
         type: "error",
         text1: "Error",
         text2: "Failed to load grades. Please try again.",
+      });
+      setIsLoading(false);
+    }
+  };
+
+  const createGrade = async () => {
+    try {
+      const formData = {
+        grade_code,
+        name,
+        campus_id: campusId,
+      };
+      console.log(formData);
+
+      const response = api.post("/admin-api/grade/", formData);
+      setIsCreating(false);
+      console.log(response.data);
+      fetchGrades();
+      console.log(formData);
+    } catch (error) {
+      console.error("Error creating grades:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to create grades. Please try again.",
+      });
+      setIsLoading(false);
+    }
+  };
+
+  const updateGrade = async (id) => {
+    try {
+      const formData = {
+        grade_code,
+        name,
+        campus_id: campusId,
+      };
+      console.log(formData);
+
+      const response = api.put(`admin-api/grade/${id}/`, formData);
+      setIsEditing(false);
+      console.log(response.data);
+      fetchGrades();
+      console.log(formData);
+    } catch (error) {
+      console.error("Error updating grades:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to update grades. Please try again.",
+      });
+      setIsLoading(false);
+    }
+  };
+
+  const deleteGrade = async (id) => {
+    try {
+      console.log(id);
+      const response = api.delete(`/admin-api/grade/${id}/`);
+      console.log(response.data);
+      fetchGrades();
+    } catch (error) {
+      console.error("Error deleting Grade:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to delete grade. Please try again.",
       });
       setIsLoading(false);
     }
@@ -75,10 +170,15 @@ const Grades = () => {
       >
         <View style={styles.content}>
           <View className="flex relative items-center justify-center flex-row bg-[#F56E00] py-5 mt-0">
-          <TouchableOpacity className="absolute left-0 ml-5" onPress={() => router.back()}>
-          <Image source={require("../assets/arrow.png")}  className="w-9 h-7"/>
-     
-          </TouchableOpacity>
+            <TouchableOpacity
+              className="absolute left-0 ml-5"
+              onPress={() => router.back()}
+            >
+              <Image
+                source={require("../assets/arrow.png")}
+                className="w-9 h-7"
+              />
+            </TouchableOpacity>
             <Text className="text-2xl font-bold text-white">
               Select the Grade
             </Text>
@@ -106,26 +206,142 @@ const Grades = () => {
                   showsVerticalScrollIndicator={false}
                 >
                   {grades.map((grade) => (
-                    <Link href={{
-                      pathname : "/subjects",
-                      params: { gradeId: grade.id },
-                    }} asChild>
-                    <TouchableOpacity
-                      key={grade.id}
-                      className="bg-white border-b border-b-black/10 mb-2 w-64 h-16 flex items-center justify-center rounded-xl"
+                    <Link
+                      href={{
+                        pathname: "/subjects",
+                        params: { gradeId: grade.id },
+                      }}
+                      asChild
                     >
-                      <Text className="text-black font-semibold text-2xl">
-                        {grade.name}
-                      </Text>
-                    </TouchableOpacity>
+                      <TouchableOpacity>
+                        <View className="flex items-center flex-row px-4">
+                          {isAdmin && (
+                            <View className="flex flex-row items-center justify-center gap-4">
+                              <TouchableOpacity>
+                                <Icon
+                                  name="delete"
+                                  size={24}
+                                  color="red"
+                                  className="absolute p-5"
+                                  onPress={() => deleteGrade(grade.id)}
+                                />
+                              </TouchableOpacity>
+                              <TouchableOpacity
+                                onPress={() => handleEditing(grade.id)}
+                              >
+                                <Icon2 name="edit" size={24} color="blue" />
+                              </TouchableOpacity>
+                            </View>
+                          )}
+
+                          <TouchableOpacity
+                            key={grade.id}
+                            onPress={() => handleNavigation(grade.id)}
+                            className="bg-white border-b border-b-black/10 mb-2 w-64 h-16 flex-row  flex items-center justify-center rounded-xl"
+                          >
+                            <Text className="text-black font-semibold text-2xl">
+                              {grade.name}
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      </TouchableOpacity>
                     </Link>
                   ))}
                 </ScrollView>
+              )}
+              {isAdmin && (
+                <TouchableOpacity
+                  onPress={() => setIsCreating(!isEditing)}
+                  className="bg-[#F56E00] mt-5 text-sm flex items-center border rounded-lg border-[#F56E00] justify-center w-64 h-16"
+                >
+                  <Text className="text-white font-bold text-lg">
+                    Create New Grade
+                  </Text>
+                </TouchableOpacity>
               )}
             </ScrollView>
           )}
         </View>
       </ImageBackground>
+      {isCreating && (
+        <View className="absolute transition ease-in h-screen w-[100%] flex items-center justify-center bg-black/70">
+          <View className="bg-gray-100 h-fit py-6 w-[90%] border flex items-center justify-center rounded-xl space-y-5 border-white px-4">
+            <Text className="font-bold text-center py-3 text-xl">
+              Create a New Grade
+            </Text>
+            <TextInput
+              placeholder="enter your gradecode."
+              name="code"
+              value={grade_code}
+              onChangeText={(text) => setGradeCode(text)}
+              placeholderTextColor="#CCCCCC"
+              clearButtonMode="while-editing"
+              className="bg-white text-lg p-4 w-full rounded-xl border-[#F56E00] border-2"
+            />
+            <TextInput
+              placeholder="enter your grade name."
+              name="name"
+              value={name}
+              onChangeText={(text) => setName(text)}
+              placeholderTextColor="#CCCCCC"
+              clearButtonMode="while-editing"
+              className="bg-white text-lg p-4  w-full  rounded-xl border-[#F56E00] border-2"
+            />
+
+            <TouchableOpacity
+              onPress={() => createGrade()}
+              className="bg-[#F56E00] py-3 mt-4 w-full flex border-[#F56E00] items-center justify-center border rounded-3xl"
+            >
+              <Text className="text-white font-bold text-xl">Submit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setIsCreating(!isCreating)}
+              className="bg-white py-3 mt-4 w-full flex border-red-700  items-center justify-center border rounded-3xl"
+            >
+              <Text className="text-red-700 font-bold text-xl">Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+      {isEditing && (
+        <View className="absolute transition ease-in h-screen w-[100%] flex items-center justify-center bg-black/70">
+          <View className="bg-gray-100 h-fit py-6 w-[90%] border flex items-center justify-center rounded-xl space-y-5 border-white px-4">
+            <Text className="font-bold text-center py-3 text-xl">
+              Edit this Campus
+            </Text>
+            <TextInput
+              placeholder="enter your gradecode."
+              name="code"
+              value={grade_code}
+              onChangeText={(text) => setGradeCode(text)}
+              placeholderTextColor="#CCCCCC"
+              clearButtonMode="while-editing"
+              className="bg-white text-lg p-4 w-full rounded-xl border-[#F56E00] border-2"
+            />
+            <TextInput
+              placeholder="enter your grade name."
+              name="name"
+              value={name}
+              onChangeText={(text) => setName(text)}
+              placeholderTextColor="#CCCCCC"
+              clearButtonMode="while-editing"
+              className="bg-white text-lg p-4  w-full  rounded-xl border-[#F56E00] border-2"
+            />
+            <TouchableOpacity
+              onPress={() => updateGrade(id)}
+              className="bg-[#F56E00] py-3 mt-4 w-full flex border-[#F56E00] items-center justify-center border rounded-3xl"
+            >
+              <Text className="text-white font-bold text-xl">Submit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setIsEditing(!isEditing)}
+              className="bg-white py-3 mt-4 w-full flex border-red-700  items-center justify-center border rounded-3xl"
+            >
+              <Text className="text-red-700 font-bold text-xl">Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </CustomSafeAreaView>
   );
 };

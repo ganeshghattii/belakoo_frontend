@@ -26,6 +26,17 @@
     "web": {
       "favicon": "./assets/customfavicon.png"
     },
-    "plugins": ["expo-font", "expo-router"]
+    "plugins": [
+      "expo-font",
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/customicon.png",
+          "color": "#ffffff",
+          "sounds": ["./assets/notification.wav"]
+        }
+      ]
+    ]
   }
 }

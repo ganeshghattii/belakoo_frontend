@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,15 +6,15 @@ import {
   StyleSheet,
   TouchableOpacity,
   ImageBackground,
+  Platform,
+  Alert,
 } from "react-native";
-
-import * as Asset from "expo-asset";
-
-import DescriptionComponent from "../Components/TextComponents/DescriptionComponent";
-import { LinearGradient } from "expo-linear-gradient"; // Import LinearGradient from expo-linear-gradient
+import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
+import { LinearGradient } from "expo-linear-gradient";
 import TitleComponent from "../Components/TextComponents/TitleComponent";
 import CustomSafeAreaView from "../Components/CustomSafeAreaView";
-import { Link, useRouter } from "expo-router";
+import { Link } from "expo-router";
 
 const Landing = () => {
   return (
@@ -48,7 +48,7 @@ const Landing = () => {
                   source={require("../assets/Landing/empower.png")}
                   className="h-14 w-14"
                 />
-                <TitleComponent titleText="Educate" />
+                <TitleComponent titleText="Empower" />
               </View>
               <View
                 style={styles.card}
@@ -58,7 +58,7 @@ const Landing = () => {
                   source={require("../assets/Landing/intel.png")}
                   className="h-14 w-14"
                 />
-                <TitleComponent titleText="  Instil Curiosity" />
+                <TitleComponent titleText="Instill Curiosity" />
               </View>
               <View
                 style={styles.card}
@@ -68,7 +68,7 @@ const Landing = () => {
                   source={require("../assets/Landing/smile.png")}
                   className="h-16 w-12"
                 />
-                <TitleComponent titleText=" Create Smiles" />
+                <TitleComponent titleText="Create Smiles" />
               </View>
             </View>
 
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
     width: "100%",
-    height: "100vh",
+    height: "100%",
     position: "absolute",
     top: 0,
     left: 0,
@@ -103,31 +103,13 @@ const styles = StyleSheet.create({
     flex: 1,
     zIndex: 1,
   },
-  logo: {
-    width: 165,
-    height: 60,
-    resizeMode: "contain",
-    marginTop: 20,
-    marginLeft: 10,
-  },
   mainContainer: {
     width: "100%",
-    display: "flex",
     flex: 1,
     justifyContent: "flex-end",
   },
-  illustration: {
-    resizeMode: "contain",
-    marginLeft: "10%",
-    width: "90%",
-    height: "45%",
-    marginBottom: 0,
-  },
   subContainer: {
     width: "100%",
-    bottom: 0,
-    zIndex: 1,
-
     paddingVertical: 28,
     paddingHorizontal: 14,
     flexDirection: "column",
@@ -151,11 +133,6 @@ const styles = StyleSheet.create({
     elevation: 5,
     gap: 4,
   },
-  cardLink: {
-    fontSize: 14,
-    color: "#740000",
-    fontWeight: "700",
-  },
   loginButton: {
     backgroundColor: "#F56E00",
     padding: 15,
@@ -164,13 +141,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     marginBottom: 10,
-  },
-  loginText: {
-    color: "#740000",
-    fontSize: 12,
-    fontWeight: "400",
-    textAlign: "center",
-    marginTop: 10,
   },
   loginButtonText: {
     color: "#fff",

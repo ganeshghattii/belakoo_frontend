@@ -1,2 +1,2 @@
-import Subjects from '../Screens/Subjects';
+import Subjects from "../Screens/Subjects";
 export default Subjects;

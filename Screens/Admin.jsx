@@ -94,6 +94,68 @@ const Admin = () => {
     fetchVolunteer();
   }, []);
 
+  const markLessonNotDone = async (id) => {
+    try {
+      const response = await api.post(`/api/lessons/${id}/mark-not-done/`);
+      console.log(response.data);
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: "Lesson marked as not done.",
+      });
+    } catch (error) {
+      console.error("Error marking lesson as not done:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to mark lesson as not done. Please try again.",
+      });
+    }
+  };
+
+  const verifyLesson = async (id) => {
+    try {
+      const response = await api.post(`/admin-api/lesson/${id}/`, {
+        verified: true,
+      });
+      console.log(response.data);
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: "Lesson verified successfully.",
+      });
+    } catch (error) {
+      console.error("Error verifying lesson:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to verify lesson. Please try again.",
+      });
+    }
+  };
+
+  // const [unverifiedLessons, setUnverifiedLessons] = useState([]);
+
+  // const fetchUnverifiedLessons = async () => {
+  //   try {
+  //     const response = await api.get(
+  //       "/admin-api/unverified-completed-lessons/"
+  //     );
+  //     setUnverifiedLessons(response.data);
+  //   } catch (error) {
+  //     console.error("Error fetching unverified lessons:", error);
+  //     Toast.show({
+  //       type: "error",
+  //       text1: "Error",
+  //       text2: "Failed to load unverified lessons. Please try again.",
+  //     });
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchUnverifiedLessons();
+  // }, []);
+
   return (
     <CustomSafeAreaView>
       <View style={styles.content} className="bg-[#F56E00]/70">
@@ -172,6 +234,28 @@ const Admin = () => {
                     Create a Volunteer
                   </Text>
                 </TouchableOpacity>
+              </View>
+              <View className="bg-white p-5 space-y-3 border-2 border-white rounded-xl my-5">
+                <View className="bg-gray-200 p-5 rounded-xl space-y-1">
+                  <Text className="text-lg font-bold">
+                    Introduction to Alegbra
+                  </Text>
+                  <Text className="text-sm font-medium text-gray-600">
+                    Lesson Id : 9af2fe9c-6ae2-4589-9599
+                  </Text>
+                  <View className="flex flex-row gap-4">
+                    <TouchableOpacity className="border-green-700 border rounded-md px-3 py-1">
+                      <Text className="text-center text-sm font-bold p-1 text-green-700">
+                        Approve
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity className="border-red-700 border rounded-md px-3 py-1">
+                      <Text className="text-center text-sm font-bold p-1 text-red-700">
+                        Reject
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
             </ScrollView>
           </View>

@@ -100,6 +100,22 @@ const Lesson = () => {
     }
   };
 
+  const deleteLesson = async () => {
+    try {
+      const response = api.delete(`/admin-api/lesson/${lessonId}/`);
+      console.log(response.data);
+      fetchGradeDetails();
+    } catch (error) {
+      console.error("Error deleting Lesson:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to delete Lesson. Please try again.",
+      });
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchLessonDetails();
   }, []);
@@ -262,8 +278,7 @@ const Lesson = () => {
               >
                 <Text className="text-white font-bold text-xl">Next</Text>
               </TouchableOpacity>
-              {isAdmin &
-              (
+              {isAdmin && (
                 <View>
                   {isEditing ? (
                     <TouchableOpacity
@@ -277,20 +292,16 @@ const Lesson = () => {
                   ) : (
                     <TouchableOpacity
                       onPress={() => setIsEditing(!isEditing)}
-                      className="bg-[#F56E00] py-2 mx-10 mb-10 flex border-[#F56E00] items-center justify-center border rounded-3xl"
+                      className="bg-[#F56E00] py-2 mx-10 mb-2 flex border-[#F56E00] items-center justify-center border rounded-3xl"
                     >
-                      <Text className="text-white font-bold text-xl">
-                        Edit Lesson Plan
-                      </Text>
+                      <Text className="text-white font-bold text-xl">Edit</Text>
                     </TouchableOpacity>
                   )}
                   <TouchableOpacity
-                    onPress={() => setIsEditing(!isEditing)}
+                    onPress={() => deleteLesson()}
                     className="bg-[#F56E00] py-2 mx-10 mb-10 flex border-[#F56E00] items-center justify-center border rounded-3xl"
                   >
-                    <Text className="text-white font-bold text-xl">
-                      Edit Lesson Plan
-                    </Text>
+                    <Text className="text-white font-bold text-xl">Delete</Text>
                   </TouchableOpacity>
                 </View>
               )}

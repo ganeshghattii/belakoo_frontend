@@ -205,6 +205,7 @@ const Assess = () => {
                     params: {
                       lessonCode: lessonCode,
                       lessonName: lessonName,
+                      lessonId: lessonId,
                       activate: true,
                       acquire: true,
                       apply: true,

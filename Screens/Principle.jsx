@@ -12,10 +12,13 @@ import { useContext } from "react";
 import axios from "axios";
 import { MyContext } from "../context/context";
 
+import useStore from "../store";
+import api from "../services/api";
+
 const Principle = () => {
   const router = useRouter();
 
-  const { lessonCode, lessonName, lessonId, activate, apply, assess, acquire } =
+  const { lessonCode, lessonName, activate, apply, assess, acquire } =
     useLocalSearchParams();
 
   const { profId } = useContext(MyContext);
@@ -25,10 +28,12 @@ const Principle = () => {
   const [isAssess] = useState(assess);
   const [isApply] = useState(apply);
 
+  const { lessonId } = useStore();
+
   const handleMarkAsDone = async () => {
-    const response = axios.post(
-      `https://belakoo-backend-02sy.onrender.com/api/lessons/${lessonCode}/mark-done/`
-    );
+    const response = api.post(`api/lessons/${lessonId}/mark-done/`);
+    console.log(lessonId);
+    console.log("Mark is Done : ", response);
     router.push({
       pathname: `/chapters`,
       params: {

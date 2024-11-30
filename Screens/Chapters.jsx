@@ -94,23 +94,6 @@ const Chapters = () => {
     }
   };
 
-  const deleteLesson = async (id) => {
-    try {
-      console.log(id);
-      const response = api.delete(`/admin-api/lesson/${id}/`);
-      console.log(response.data);
-      fetchGradeDetails();
-    } catch (error) {
-      console.error("Error deleting Lesson:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to delete Lesson. Please try again.",
-      });
-      setIsLoading(false);
-    }
-  };
-
   return (
     <CustomSafeAreaView>
       <ImageBackground source={require("../assets/Content/bg2.png")} />
@@ -137,18 +120,6 @@ const Chapters = () => {
           <View className="flex  flex-row flex-wrap items-center justify-center">
             {chapters.map((item, index) => (
               <View className="Flex items-center justify--center">
-                {isAdmin && (
-                  <TouchableOpacity className="absolute right-14 top-6 z-10">
-                    <Icon
-                      name="delete"
-                      size={15}
-                      color="red"
-                      className="absolute p-5"
-                      onPress={() => deleteLesson(item.id)}
-                    />
-                  </TouchableOpacity>
-                )}
-
                 <TouchableOpacity
                   key={index}
                   className="bg-white h-20 flex items-center justify-center  space-y-3 border border-white rounded-lg m-5 w-20"

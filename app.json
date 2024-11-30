@@ -37,6 +37,14 @@
           "sounds": ["./assets/notification.wav"]
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "ff4647f1-1086-4d00-a1dc-66312068abde"
+      }
+    }
   }
 }

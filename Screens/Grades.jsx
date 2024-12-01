@@ -205,8 +205,9 @@ const Grades = () => {
                   className="bg-white border mt-5 rounded-lg border-white h-36"
                   showsVerticalScrollIndicator={false}
                 >
-                  {grades.map((grade) => (
+                  {grades.map((grade, index) => (
                     <Link
+                      key={index}
                       href={{
                         pathname: "/subjects",
                         params: { gradeId: grade.id },

@@ -134,7 +134,7 @@ const Chapters = () => {
                     })
                   }
                 >
-                  {item.is_done && (
+                  {item.verified && item.is_done && (
                     <AntDesign name="checkcircle" size={20} color="green" />
                   )}
 

@@ -104,6 +104,7 @@ const Lesson = () => {
     try {
       const response = api.delete(`/admin-api/lesson/${lessonId}/`);
       console.log(response.data);
+      router.replace("/instructions");
       fetchGradeDetails();
     } catch (error) {
       console.error("Error deleting Lesson:", error);

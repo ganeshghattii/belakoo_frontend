@@ -57,7 +57,10 @@ const Admin = () => {
       };
       console.log(formData);
 
-      const response = api.post("/admin-api/volunteers/create/", formData);
+      const response = await api.post(
+        "/admin-api/volunteers/create/",
+        formData
+      );
       setIsEditing(false);
       console.log(response.data);
       fetchVolunteer();
@@ -76,7 +79,7 @@ const Admin = () => {
   const deleteVolunteer = async (id) => {
     try {
       console.log(id);
-      const response = api.delete(`/admin-api/volunteers/${id}/delete/`);
+      const response = await api.delete(`/admin-api/volunteers/${id}/delete/`);
       console.log(response.data);
       fetchVolunteer();
     } catch (error) {
@@ -98,6 +101,7 @@ const Admin = () => {
     try {
       const response = await api.post(`/api/lessons/${id}/mark-not-done/`);
       console.log(response.data);
+      fetchUnverifiedLessons();
       Toast.show({
         type: "success",
         text1: "Success",
@@ -114,11 +118,14 @@ const Admin = () => {
   };
 
   const verifyLesson = async (id) => {
+    const formData = {
+      verified: true,
+    };
+
     try {
-      const response = await api.post(`/admin-api/lesson/${id}/`, {
-        verified: true,
-      });
+      const response = await api.put(`/admin-api/lesson/${id}/`, formData);
       console.log(response.data);
+      fetchUnverifiedLessons();
       Toast.show({
         type: "success",
         text1: "Success",
@@ -134,27 +141,28 @@ const Admin = () => {
     }
   };
 
-  // const [unverifiedLessons, setUnverifiedLessons] = useState([]);
+  const [unverifiedLessons, setUnverifiedLessons] = useState([]);
 
-  // const fetchUnverifiedLessons = async () => {
-  //   try {
-  //     const response = await api.get(
-  //       "/admin-api/unverified-completed-lessons/"
-  //     );
-  //     setUnverifiedLessons(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching unverified lessons:", error);
-  //     Toast.show({
-  //       type: "error",
-  //       text1: "Error",
-  //       text2: "Failed to load unverified lessons. Please try again.",
-  //     });
-  //   }
-  // };
+  const fetchUnverifiedLessons = async () => {
+    try {
+      const response = await api.get(
+        "/admin-api/unverified-completed-lessons/"
+      );
+      setUnverifiedLessons(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching unverified lessons:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to load unverified lessons. Please try again.",
+      });
+    }
+  };
 
-  // useEffect(() => {
-  //   fetchUnverifiedLessons();
-  // }, []);
+  useEffect(() => {
+    fetchUnverifiedLessons();
+  }, []);
 
   return (
     <CustomSafeAreaView>
@@ -236,26 +244,55 @@ const Admin = () => {
                 </TouchableOpacity>
               </View>
               <View className="bg-white p-5 space-y-3 border-2 border-white rounded-xl my-5">
-                <View className="bg-gray-200 p-5 rounded-xl space-y-1">
-                  <Text className="text-lg font-bold">
-                    Introduction to Alegbra
-                  </Text>
-                  <Text className="text-sm font-medium text-gray-600">
-                    Lesson Id : 9af2fe9c-6ae2-4589-9599
-                  </Text>
-                  <View className="flex flex-row gap-4">
-                    <TouchableOpacity className="border-green-700 border rounded-md px-3 py-1">
-                      <Text className="text-center text-sm font-bold p-1 text-green-700">
-                        Approve
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity className="border-red-700 border rounded-md px-3 py-1">
-                      <Text className="text-center text-sm font-bold p-1 text-red-700">
-                        Reject
-                      </Text>
-                    </TouchableOpacity>
+                <Text className="text-xl font-bold">Verify Chapters</Text>
+                {unverifiedLessons.length === 0 ? (
+                  <View className="p-5 bg-gray-200 border rounded-xl border-gray-200">
+                    <Text className="text-gray-600 font-bold text-center text-md">
+                      No Pending Chapters for Verification
+                    </Text>
                   </View>
-                </View>
+                ) : (
+                  <View>
+                    {unverifiedLessons?.map((item, index) => (
+                      <View
+                        className="bg-gray-200 p-5 rounded-xl space-y-1"
+                        key={index}
+                      >
+                        <Text className="text-lg font-bold">{item.name}</Text>
+                        <Text className="text-sm font-medium text-gray-600">
+                          Subject : {item.subject.name}
+                        </Text>
+                        <Text className="text-sm font-medium text-gray-600">
+                          Grade : {item.grade.name}
+                        </Text>
+                        <Text className="text-sm font-medium text-gray-600">
+                          Proficiency : {item.proficiency.name}
+                        </Text>
+                        <Text className="text-sm font-medium text-gray-600">
+                          Completed By: {item.completed_by.name}
+                        </Text>
+                        <View className="flex flex-row gap-4">
+                          <TouchableOpacity
+                            className="border-green-700 border rounded-md px-3 py-1"
+                            onPress={() => verifyLesson(item.id)}
+                          >
+                            <Text className="text-center text-sm font-bold p-1 text-green-700">
+                              Approve
+                            </Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            className="border-red-700 border rounded-md px-3 py-1"
+                            onPress={() => markLessonNotDone(item.id)}
+                          >
+                            <Text className="text-center text-sm font-bold p-1 text-red-700">
+                              Reject
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
               </View>
             </ScrollView>
           </View>

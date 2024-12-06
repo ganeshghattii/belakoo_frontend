@@ -12,7 +12,7 @@ import { useRouter } from "expo-router";
 import CustomSafeAreaView from "../Components/CustomSafeAreaView";
 import { ImageBackground } from "react-native";
 import { useState, useEffect } from "react";
-import Toast from "react-native-toast-message";
+import Toast from "../Components/Toast";
 import { AntDesign } from "@expo/vector-icons";
 
 import { ActivityIndicator } from "react-native";
@@ -29,6 +29,9 @@ const Assess = () => {
   const { lessonCode, lessonName } = useLocalSearchParams();
   const [isLoading, setIsLoading] = useState(true);
 
+  const [isDeleting, setIsDeleting] = useState();
+  const [id, setId] = useState();
+
   const [isEditing, setIsEditing] = useState();
   const [assessment, setAssessment] = useState();
 
@@ -44,6 +47,14 @@ const Assess = () => {
 
   const { userRole, lessonId } = useStore();
   const isAdmin = userRole === "ADMIN";
+
+  const [toastType, setToastType] = useState();
+  const [toastMessage, setToastMessage] = useState();
+
+  const handleDeleting = (id) => {
+    setIsDeleting(true);
+    setId(id);
+  };
 
   const fetchLessonDetails = async () => {
     try {
@@ -78,9 +89,13 @@ const Assess = () => {
       console.log(updatedData);
       fetchLessonDetails();
       setIsCreating(!isCreating);
+      setToastType("success");
+      setToastMessage("Field created successfully.");
     } catch (error) {
       console.log("Failed to update");
       console.error("Error:", error.response?.data || error.message);
+      setToastType("error");
+      setToastMessage("Field was not created successfully.");
     }
   };
 
@@ -90,15 +105,19 @@ const Assess = () => {
     setAssessData(updatedData);
 
     const finalData = { assess: updatedData };
-
     try {
       const response = api.put(`admin-api/lesson/${lessonId}/`, finalData);
       console.log("Response data:", response.data);
       console.log(updatedData);
       fetchLessonDetails();
+      setToastType("success");
+      setToastMessage("Field deleted successfully.");
+      setIsDeleting(!isDeleting);
     } catch (error) {
       console.log("Failed to update");
       console.error("Error:", error.response?.data || error.message);
+      setToastType("error");
+      setToastMessage("Failed to delete field. Please try again.");
     }
   };
 
@@ -121,15 +140,18 @@ const Assess = () => {
       desc: editDesc,
     };
     const finalData = { assess: updatedData };
-
     try {
       const response = api.put(`admin-api/lesson/${lessonId}/`, finalData);
       console.log("Response data:", response.data);
       console.log(updatedData);
       fetchLessonDetails();
+      setToastType("success");
+      setToastMessage("Field updated successfully.");
     } catch (error) {
       console.log("Failed to update");
       console.error("Error:", error.response?.data || error.message);
+      setToastType("error");
+      setToastMessage("Failed to update field. Please try again.");
     }
 
     setIsEdit(false);
@@ -185,7 +207,7 @@ const Assess = () => {
                         <TouchableOpacity className="bg-white px-3 py-1 border border-white rounded-xl">
                           <Text
                             className="text-red-500 text-semibold"
-                            onPress={() => deleteField(index)}
+                            onPress={() => handleDeleting(index)}
                           >
                             Delete
                           </Text>
@@ -230,7 +252,6 @@ const Assess = () => {
               )}
             </ScrollView>
           )}
-
           <View></View>
           {isCreating && (
             <View className="absolute transition ease-in h-screen w-[100%] flex items-center justify-center bg-black/70">
@@ -305,6 +326,29 @@ const Assess = () => {
               </View>
             </View>
           )}
+          {isDeleting && (
+            <View className="absolute transition ease-in h-screen w-[100%] flex items-center justify-center bg-black/70">
+              <View className="bg-gray-100 h-fit py-6 w-[90%] border flex items-center justify-center rounded-xl space-y-5 border-white px-4">
+                <Text className="font-bold text-center py-3 text-xl">
+                  Are you sure you want to delete this Field?
+                </Text>
+
+                <TouchableOpacity
+                  onPress={() => deleteField(id)}
+                  className="bg-[#F56E00] py-3 mt-4 w-full flex border-[#F56E00] items-center justify-center border rounded-3xl"
+                >
+                  <Text className="text-white font-bold text-xl">Delete</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setIsDeleting(!isDeleting)}
+                  className="bg-white py-3 mt-4 w-full flex border-red-700  items-center justify-center border rounded-3xl"
+                >
+                  <Text className="text-red-700 font-bold text-xl">Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+          {toastMessage && <Toast type={toastType} message={toastMessage} />}
         </ImageBackground>
       </View>
     </CustomSafeAreaView>

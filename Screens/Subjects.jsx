@@ -18,6 +18,8 @@ import Toast from "react-native-toast-message";
 import { useRouter } from "expo-router";
 import CustomSafeAreaView from "../Components/CustomSafeAreaView";
 
+import { Link } from "expo-router";
+
 import useStore from "../store";
 
 const Subjects = () => {
@@ -25,6 +27,9 @@ const Subjects = () => {
   const [campusData, setCampusData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+
+  const { userRole } = useStore();
+  const isAdmin = userRole === "ADMIN";
 
   const { setValue } = useStore();
 
@@ -82,6 +87,24 @@ const Subjects = () => {
               <View style={styles.canvasContainer}>
                 {campusData && campusData.subjects && (
                   <Cube subjects={campusData.subjects} />
+                )}
+              </View>
+
+              <View className="w-full flex items-center justify-center">
+                {isAdmin && (
+                  <Link
+                    href={{
+                      pathname: "/manage",
+                      params: { gradeId: gradeId },
+                    }}
+                    asChild
+                  >
+                    <TouchableOpacity className="bg-[#F56E00] mt-5 text-sm flex items-center border rounded-lg border-[#F56E00] justify-center w-64 h-16">
+                      <Text className="text-white font-bold text-lg">
+                        Manage Subjects
+                      </Text>
+                    </TouchableOpacity>
+                  </Link>
                 )}
               </View>
             </>

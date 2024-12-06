@@ -9,15 +9,16 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 
-import { MdDeleteOutline } from "react-icons/md";
-
 import { Text } from "react-native";
+import Icon from "react-native-vector-icons/AntDesign";
+
+import Toast from "../Components/Toast";
 
 import { ScrollView } from "react-native";
+import useStore from "../store";
 
 import CustomSafeAreaView from "../Components/CustomSafeAreaView";
 import api from "../services/api";
-import Toast from "react-native-toast-message";
 
 import { useRouter } from "expo-router";
 
@@ -28,9 +29,22 @@ const Admin = () => {
   const [isLoading, setIsLoading] = useState();
   const [isEditing, setIsEditing] = useState();
 
+  const [isDeleting, setIsDeleting] = useState();
+  const [id, setId] = useState();
+
+  const { adminEmail } = useStore();
+
   const [name, setName] = useState();
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
+
+  const [toastType, setToastType] = useState();
+  const [toastMessage, setToastMessage] = useState();
+
+  const handleDeleting = (id) => {
+    setIsDeleting(true);
+    setId(id);
+  };
 
   const fetchVolunteer = async () => {
     try {
@@ -65,13 +79,12 @@ const Admin = () => {
       console.log(response.data);
       fetchVolunteer();
       console.log(formData);
+      setToastType("success");
+      setToastMessage("Grade created successfully.");
     } catch (error) {
       console.error("Error creating volunteer:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to create volunteer. Please try again.",
-      });
+      setToastType("error");
+      setToastMessage("Grade was not created successfully.");
       setIsLoading(false);
     }
   };
@@ -82,13 +95,13 @@ const Admin = () => {
       const response = await api.delete(`/admin-api/volunteers/${id}/delete/`);
       console.log(response.data);
       fetchVolunteer();
+      setIsDeleting(false);
+      setToastType("success");
+      setToastMessage("Volunteer deleted successfully.");
     } catch (error) {
       console.error("Error deleting volunteer:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to delete volunteer. Please try again.",
-      });
+      setToastType("errorr");
+      setToastMessage("Volunteer did not get created.");
       setIsLoading(false);
     }
   };
@@ -190,7 +203,7 @@ const Admin = () => {
                 Welcome Admin !
               </Text>
               <Text className="text-md px-3 font-semibold text-black/50">
-                Email : john.doe@example.com
+                Email : {adminEmail}
               </Text>
               <View className="bg-white p-5 space-y-3 border-2 border-white rounded-xl my-5">
                 <Text className="text-xl font-bold">Volunteer Information</Text>
@@ -206,11 +219,16 @@ const Admin = () => {
                       className="bg-gray-100 my-2 p-4 border border-gray-100 rounded-xl"
                     >
                       <TouchableOpacity
-                        onPress={() => deleteVolunteer(item.id)}
-                        className="absolute z-10 right-4 top-5 border-red-700 border rounded-md w-[20%]"
+                        onPress={() => handleDeleting(item.id)}
+                        className="absolute z-10 right-4 top-5 border-red-700 border rounded-md "
                       >
                         <Text className="text-center text-sm font-bold p-1 text-red-700">
-                          Delete
+                          <Icon
+                            name="delete"
+                            size={20}
+                            color="#B91C1C"
+                            className="absolute p-5"
+                          />
                         </Text>
                       </TouchableOpacity>
                       <Text className="text-lg font-semibold capitalize">
@@ -244,18 +262,18 @@ const Admin = () => {
                 </TouchableOpacity>
               </View>
               <View className="bg-white p-5 space-y-3 border-2 border-white rounded-xl my-5">
-                <Text className="text-xl font-bold">Verify Chapters</Text>
+                <Text className="text-xl font-bold">Verify Lessons</Text>
                 {unverifiedLessons.length === 0 ? (
                   <View className="p-5 bg-gray-200 border rounded-xl border-gray-200">
                     <Text className="text-gray-600 font-bold text-center text-md">
-                      No Pending Chapters for Verification
+                      No Pending Lessons for Verification
                     </Text>
                   </View>
                 ) : (
                   <View>
                     {unverifiedLessons?.map((item, index) => (
                       <View
-                        className="bg-gray-200 p-5 rounded-xl space-y-1"
+                        className="bg-gray-200 p-5 rounded-xl space-y-1 my-3"
                         key={index}
                       >
                         <Text className="text-lg font-bold">{item.name}</Text>
@@ -347,6 +365,29 @@ const Admin = () => {
             </View>
           </View>
         )}
+        {isDeleting && (
+          <View className="absolute transition ease-in h-screen w-[100%] flex items-center justify-center bg-black/70">
+            <View className="bg-gray-100 h-fit py-6 w-[90%] border flex items-center justify-center rounded-xl space-y-5 border-white px-4">
+              <Text className="font-bold text-center py-3 text-xl">
+                Are you sure you want to delete this Volunteer?
+              </Text>
+
+              <TouchableOpacity
+                onPress={() => deleteVolunteer(id)}
+                className="bg-[#F56E00] py-3 mt-4 w-full flex border-[#F56E00] items-center justify-center border rounded-3xl"
+              >
+                <Text className="text-white font-bold text-xl">Delete</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setIsDeleting(!isDeleting)}
+                className="bg-white py-3 mt-4 w-full flex border-red-700  items-center justify-center border rounded-3xl"
+              >
+                <Text className="text-red-700 font-bold text-xl">Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+        {toastMessage && <Toast type={toastType} message={toastMessage} />}
       </View>
     </CustomSafeAreaView>
   );

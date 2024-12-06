@@ -34,8 +34,8 @@ export default function RootLayout() {
   Text.defaultProps.style = { fontFamily: "gothambold" };
 
   return (
-      <MyProvider>
-        <Slot />
-      </MyProvider>
+    <MyProvider>
+      <Slot />
+    </MyProvider>
   );
 }

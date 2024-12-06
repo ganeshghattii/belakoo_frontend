@@ -19,7 +19,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { ActivityIndicator } from "react-native";
 
 import CustomSafeAreaView from "../Components/CustomSafeAreaView";
-import Toast from "react-native-toast-message";
+import Toast from "../Components/Toast";
 import api from "../services/api";
 import { useRouter, useLocalSearchParams } from "expo-router";
 
@@ -28,11 +28,14 @@ import { ScrollView } from "react-native";
 const Lesson = () => {
   const router = useRouter();
 
-  const { lessonCode, lessonName, lessonId } = useLocalSearchParams();
+  const { lessonCode, lessonName, lessonId, profId, subId } =
+    useLocalSearchParams();
   const [isLoading, setIsLoading] = useState(true);
 
   const [lessonData, setLessonData] = useState();
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState();
+  const [isDeleting, setIsDeleting] = useState();
+  const [id, setId] = useState();
 
   const [objective, setObjective] = useState();
   const [duration, setDuration] = useState();
@@ -44,6 +47,13 @@ const Lesson = () => {
 
   const { userRole } = useStore();
   const isAdmin = userRole === "ADMIN";
+
+  const [toastType, setToastType] = useState();
+  const [toastMessage, setToastMessage] = useState();
+
+  const handleDeleting = () => {
+    setIsDeleting(true);
+  };
 
   const handleEditing = () => {
     setIsEditing(true);
@@ -64,11 +74,6 @@ const Lesson = () => {
     } catch (error) {
       console.error("Error fetching lesson details:", error);
       console.log(lessonCode);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to load chapters. Please try again.",
-      });
       setIsLoading(false);
     }
   };
@@ -89,13 +94,12 @@ const Lesson = () => {
       console.log(response.data);
 
       console.log(formData);
+      setToastType("success");
+      setToastMessage("Lesson updated successfully.");
     } catch (error) {
       console.error("Error updating lesson:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to update lesson. Please try again.",
-      });
+      setToastType("error");
+      setToastMessage("Failed to update lesson. Please try again.");
       setIsLoading(false);
     }
   };
@@ -104,15 +108,19 @@ const Lesson = () => {
     try {
       const response = api.delete(`/admin-api/lesson/${lessonId}/`);
       console.log(response.data);
-      router.replace("/instructions");
-      fetchGradeDetails();
+      router.push({
+        pathname: "/chapters",
+        params: {
+          proficiencyId: profId,
+          subjectId: subId,
+        },
+      });
+      setToastType("success");
+      setToastMessage("Lesson deleted successfully.");
     } catch (error) {
       console.error("Error deleting Lesson:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to delete Lesson. Please try again.",
-      });
+      setToastType("error");
+      setToastMessage("Failed to delete lesson. Please try again.");
       setIsLoading(false);
     }
   };
@@ -299,7 +307,7 @@ const Lesson = () => {
                     </TouchableOpacity>
                   )}
                   <TouchableOpacity
-                    onPress={() => deleteLesson()}
+                    onPress={() => handleDeleting()}
                     className="bg-[#F56E00] py-2 mx-10 mb-10 flex border-[#F56E00] items-center justify-center border rounded-3xl"
                   >
                     <Text className="text-white font-bold text-xl">Delete</Text>
@@ -307,8 +315,33 @@ const Lesson = () => {
                 </View>
               )}
             </ScrollView>
+            {isDeleting && (
+              <View className="absolute  transition ease-in h-screen w-screen flex items-center justify-center bg-black/70">
+                <View className="bg-gray-100 h-fit py-6 w-[90%] border flex items-center justify-center rounded-xl space-y-5 border-white px-4">
+                  <Text className="font-bold text-center py-3 text-xl">
+                    Are you sure you want to delete this Lesson?
+                  </Text>
+
+                  <TouchableOpacity
+                    onPress={() => deleteLesson()}
+                    className="bg-[#F56E00] py-3 mt-4 w-full flex border-[#F56E00] items-center justify-center border rounded-3xl"
+                  >
+                    <Text className="text-white font-bold text-xl">Delete</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setIsDeleting(!isDeleting)}
+                    className="bg-white py-3 mt-4 w-full flex border-red-700  items-center justify-center border rounded-3xl"
+                  >
+                    <Text className="text-red-700 font-bold text-xl">
+                      Cancel
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
           </View>
         )}
+        {toastMessage && <Toast type={toastType} message={toastMessage} />}
       </View>
     </CustomSafeAreaView>
   );

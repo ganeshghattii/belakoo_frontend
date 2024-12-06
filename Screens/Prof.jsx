@@ -14,12 +14,15 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import CustomSafeAreaView from "../Components/CustomSafeAreaView";
 import api from "../services/api";
 
+import Toast from "../Components/Toast";
+
 import useStore from "../store";
 
 import Icon from "react-native-vector-icons/AntDesign";
 import Icon2 from "react-native-vector-icons/FontAwesome";
 
 import { Link } from "expo-router";
+import { set } from "react-hook-form";
 
 const Prof = () => {
   const { subjectId, subjectName, gradeId } = useLocalSearchParams();
@@ -36,20 +39,31 @@ const Prof = () => {
 
   const [isEditing, setIsEditing] = useState();
   const [isCreating, setIsCreating] = useState();
+  const [isDeleting, setIsDeleting] = useState();
+  const [id, setId] = useState();
 
   const [proficiency_code, setProficiencyCode] = useState();
   const [name, setName] = useState();
-  const [id, setId] = useState();
 
   const { userRole } = useStore();
   const isAdmin = userRole === "ADMIN";
+
+  const [toastType, setToastType] = useState();
+  const [toastMessage, setToastMessage] = useState();
 
   useEffect(() => {
     fetchProf();
   }, []);
 
-  const handleEditing = (id) => {
+  const handleDeleting = (id) => {
+    setIsDeleting(true);
+    setId(id);
+  };
+
+  const handleEditing = (id, code, name) => {
     setIsEditing(true);
+    setProficiencyCode(code);
+    setName(name);
     setId(id);
   };
 
@@ -71,6 +85,7 @@ const Prof = () => {
         `https://belakoo-backend-02sy.onrender.com/api/subjects/${subjectId}/`
       );
       setProf(response.data.proficiencies);
+      console.log(response.data.proficiencies);
       setIsProf(true);
       setProfTab(true);
       setIsLoading(false);
@@ -91,15 +106,16 @@ const Prof = () => {
       const response = api.post("/admin-api/proficiency/", formData);
       setIsCreating(false);
       console.log(response.data);
+      setProficiencyCode("");
+      setName("");
       fetchProf();
+      setToastType("success");
+      setToastMessage("Prof created successfully.");
       console.log(formData);
     } catch (error) {
       console.error("Error creating proficiency:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to create proficiency Please try again.",
-      });
+      setToastMessage("Prof was not created successfully.");
+      setIsLoading(false);
       setIsLoading(false);
     }
   };
@@ -117,14 +133,13 @@ const Prof = () => {
       setIsEditing(false);
       console.log(response.data);
       fetchProf();
+      setToastType("success");
+      setToastMessage("Prof updated successfully.");
       console.log(formData);
     } catch (error) {
       console.error("Error updating proficiency:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to update proficiency. Please try again.",
-      });
+      setToastType("error");
+      setToastMessage("Failed to update prof. Please try again.");
       setIsLoading(false);
     }
   };
@@ -134,14 +149,14 @@ const Prof = () => {
       console.log(id);
       const response = api.delete(`/admin-api/proficiency/${id}/`);
       console.log(response.data);
+      setIsDeleting(false);
       fetchProf();
+      setToastType("success");
+      setToastMessage("Prof deleted successfully.");
     } catch (error) {
       console.error("Error deleting Proficiency:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to delete proficiency. Please try again.",
-      });
+      setToastType("error");
+      setToastMessage("Failed to delete prof. Please try again.");
       setIsLoading(false);
     }
   };
@@ -211,11 +226,17 @@ const Prof = () => {
                                   size={24}
                                   color="red"
                                   className="absolute p-5"
-                                  onPress={() => deleteProficiency(prof.id)}
+                                  onPress={() => handleDeleting(prof.id)}
                                 />
                               </TouchableOpacity>
                               <TouchableOpacity
-                                onPress={() => handleEditing(prof.id)}
+                                onPress={() =>
+                                  handleEditing(
+                                    prof.id,
+                                    prof.proficiency_code,
+                                    prof.name
+                                  )
+                                }
                               >
                                 <Icon2 name="edit" size={24} color="blue" />
                               </TouchableOpacity>
@@ -384,6 +405,29 @@ const Prof = () => {
           </View>
         </View>
       )}
+      {isDeleting && (
+        <View className="absolute transition ease-in h-screen w-[100%] flex items-center justify-center bg-black/70">
+          <View className="bg-gray-100 h-fit py-6 w-[90%] border flex items-center justify-center rounded-xl space-y-5 border-white px-4">
+            <Text className="font-bold text-center py-3 text-xl">
+              Are you sure you want to delete this Proficiency?
+            </Text>
+
+            <TouchableOpacity
+              onPress={() => deleteProficiency(id)}
+              className="bg-[#F56E00] py-3 mt-4 w-full flex border-[#F56E00] items-center justify-center border rounded-3xl"
+            >
+              <Text className="text-white font-bold text-xl">Delete</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setIsDeleting(!isDeleting)}
+              className="bg-white py-3 mt-4 w-full flex border-red-700  items-center justify-center border rounded-3xl"
+            >
+              <Text className="text-red-700 font-bold text-xl">Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+      {toastMessage && <Toast type={toastType} message={toastMessage} />}
     </CustomSafeAreaView>
   );
 };

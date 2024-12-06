@@ -14,6 +14,8 @@ const authService = {
     if (response.data.access) {
       await AsyncStorage.setItem("userToken", response.data.access);
       await AsyncStorage.setItem("refreshToken", response.data.refresh);
+      useStore.getState().setRefreshToken(response.data.refresh);
+      useStore.getState().setAdminRole(response.data.email);
     }
     console.log(response.data);
     return response.data;

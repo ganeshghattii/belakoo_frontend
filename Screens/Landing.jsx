@@ -10,13 +10,37 @@ import {
   Alert,
 } from "react-native";
 import * as Notifications from "expo-notifications";
+import { useRouter } from "expo-router";
 import * as Device from "expo-device";
 import { LinearGradient } from "expo-linear-gradient";
 import TitleComponent from "../Components/TextComponents/TitleComponent";
 import CustomSafeAreaView from "../Components/CustomSafeAreaView";
 import { Link } from "expo-router";
 
+import useStore from "../store";
+import api from "../services/api";
+import authService from "../services/authService";
+
 const Landing = () => {
+  const { refreshToken } = useStore();
+
+  const router = useRouter();
+
+  const isLoggedIn = refreshToken !== "";
+
+  const handleRefreshToken = async () => {
+    if (refreshToken) {
+      const { access } = await authService.refreshToken();
+      if (access) {
+        router.push("/instructions");
+      } else {
+        router.push("/login");
+      }
+    } else {
+      router.push("/login");
+    }
+  };
+
   return (
     <CustomSafeAreaView>
       <ImageBackground
@@ -72,11 +96,12 @@ const Landing = () => {
               </View>
             </View>
 
-            <Link href="/login" asChild>
-              <TouchableOpacity style={styles.loginButton}>
-                <Text style={styles.loginButtonText}>Log in</Text>
-              </TouchableOpacity>
-            </Link>
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={() => handleRefreshToken()}
+            >
+              <Text style={styles.loginButtonText}>Continue</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -92,7 +117,7 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
     width: "100%",
-    height: "100%",
+    height: "110%",
     position: "absolute",
     top: 0,
     left: 0,

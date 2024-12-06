@@ -16,7 +16,7 @@ import CustomHeader from "../Components/CustomHeader";
 import TitleContainer from "../Components/TitleContainer";
 import { AntDesign } from "@expo/vector-icons";
 import api from "../services/api";
-import Toast from "react-native-toast-message";
+import Toast from "../Components/Toast";
 
 import { Link } from "expo-router";
 
@@ -24,6 +24,7 @@ import Icon from "react-native-vector-icons/AntDesign";
 import Icon2 from "react-native-vector-icons/FontAwesome";
 
 import useStore from "../store";
+import { set } from "react-hook-form";
 
 const Grades = () => {
   const { campusId } = useLocalSearchParams();
@@ -42,20 +43,31 @@ const Grades = () => {
 
   const [isEditing, setIsEditing] = useState();
   const [isCreating, setIsCreating] = useState();
+  const [isDeleting, setIsDeleting] = useState();
+  const [id, setId] = useState();
 
   const [grade_code, setGradeCode] = useState();
   const [name, setName] = useState();
-  const [id, setId] = useState();
 
   const { userRole } = useStore();
   const isAdmin = userRole === "ADMIN";
+
+  const [toastType, setToastType] = useState();
+  const [toastMessage, setToastMessage] = useState();
 
   useEffect(() => {
     fetchGrades();
   }, []);
 
-  const handleEditing = (id) => {
+  const handleDeleting = (id) => {
+    setIsDeleting(true);
+    setId(id);
+  };
+
+  const handleEditing = (id, code, name) => {
     setIsEditing(true);
+    setGradeCode(code);
+    setName(name);
     setId(id);
   };
 
@@ -70,14 +82,11 @@ const Grades = () => {
     try {
       const response = await api.get(`/api/campuses/${campusId}/`);
       setGrades(response.data.grades);
+      console.log(response.data.grades);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching grades:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to load grades. Please try again.",
-      });
+
       setIsLoading(false);
     }
   };
@@ -95,14 +104,15 @@ const Grades = () => {
       setIsCreating(false);
       console.log(response.data);
       fetchGrades();
+      setGradeCode("");
+      setName("");
       console.log(formData);
+      setToastType("success");
+      setToastMessage("Grade created successfully.");
     } catch (error) {
       console.error("Error creating grades:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to create grades. Please try again.",
-      });
+      setToastType("error");
+      setToastMessage("Grade was not created successfully.");
       setIsLoading(false);
     }
   };
@@ -121,13 +131,12 @@ const Grades = () => {
       console.log(response.data);
       fetchGrades();
       console.log(formData);
+      setToastType("success");
+      setToastMessage("Grade updated successfully.");
     } catch (error) {
       console.error("Error updating grades:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to update grades. Please try again.",
-      });
+      setToastType("error");
+      setToastMessage("Failed to update grade. Please try again.");
       setIsLoading(false);
     }
   };
@@ -137,14 +146,14 @@ const Grades = () => {
       console.log(id);
       const response = api.delete(`/admin-api/grade/${id}/`);
       console.log(response.data);
+      setIsDeleting(false);
       fetchGrades();
+      setToastType("success");
+      setToastMessage("Grade deleted successfully.");
     } catch (error) {
       console.error("Error deleting Grade:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to delete grade. Please try again.",
-      });
+      setToastType("error");
+      setToastMessage("Failed to delete grade. Please try again.");
       setIsLoading(false);
     }
   };
@@ -224,11 +233,17 @@ const Grades = () => {
                                   size={24}
                                   color="red"
                                   className="absolute p-5"
-                                  onPress={() => deleteGrade(grade.id)}
+                                  onPress={() => handleDeleting(grade.id)}
                                 />
                               </TouchableOpacity>
                               <TouchableOpacity
-                                onPress={() => handleEditing(grade.id)}
+                                onPress={() =>
+                                  handleEditing(
+                                    grade.id,
+                                    grade.grade_code,
+                                    grade.name
+                                  )
+                                }
                               >
                                 <Icon2 name="edit" size={24} color="blue" />
                               </TouchableOpacity>
@@ -308,7 +323,7 @@ const Grades = () => {
         <View className="absolute transition ease-in h-screen w-[100%] flex items-center justify-center bg-black/70">
           <View className="bg-gray-100 h-fit py-6 w-[90%] border flex items-center justify-center rounded-xl space-y-5 border-white px-4">
             <Text className="font-bold text-center py-3 text-xl">
-              Edit this Campus
+              Edit this Grade
             </Text>
             <TextInput
               placeholder="enter your gradecode."
@@ -343,6 +358,29 @@ const Grades = () => {
           </View>
         </View>
       )}
+      {isDeleting && (
+        <View className="absolute transition ease-in h-screen w-[100%] flex items-center justify-center bg-black/70">
+          <View className="bg-gray-100 h-fit py-6 w-[90%] border flex items-center justify-center rounded-xl space-y-5 border-white px-4">
+            <Text className="font-bold text-center py-3 text-xl">
+              Are you sure you want to delete this Grade?
+            </Text>
+
+            <TouchableOpacity
+              onPress={() => deleteGrade(id)}
+              className="bg-[#F56E00] py-3 mt-4 w-full flex border-[#F56E00] items-center justify-center border rounded-3xl"
+            >
+              <Text className="text-white font-bold text-xl">Delete</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setIsDeleting(!isDeleting)}
+              className="bg-white py-3 mt-4 w-full flex border-red-700  items-center justify-center border rounded-3xl"
+            >
+              <Text className="text-red-700 font-bold text-xl">Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+      {toastMessage && <Toast type={toastType} message={toastMessage} />}
     </CustomSafeAreaView>
   );
 };

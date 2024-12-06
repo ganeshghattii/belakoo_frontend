@@ -12,7 +12,7 @@ import { useRouter } from "expo-router";
 import CustomSafeAreaView from "../Components/CustomSafeAreaView";
 import { ImageBackground } from "react-native";
 import { useState, useEffect } from "react";
-import Toast from "react-native-toast-message";
+import Toast from "../Components/Toast";
 
 import { ActivityIndicator } from "react-native";
 
@@ -36,6 +36,9 @@ const Acquire = () => {
   const [isCreating, setIsCreating] = useState();
   const [index, setIndex] = useState();
 
+  const [isDeleting, setIsDeleting] = useState();
+  const [id, setId] = useState();
+
   const [title, setTitle] = useState();
   const [desc, setDesc] = useState();
 
@@ -44,8 +47,16 @@ const Acquire = () => {
 
   const [hook, setHook] = useState();
 
+  const [toastType, setToastType] = useState();
+  const [toastMessage, setToastMessage] = useState();
+
   const { userRole } = useStore();
   const isAdmin = userRole === "ADMIN";
+
+  const handleDeleting = (id) => {
+    setIsDeleting(true);
+    setId(id);
+  };
 
   const fetchLessonDetails = async () => {
     try {
@@ -58,11 +69,8 @@ const Acquire = () => {
     } catch (error) {
       console.error("Error fetching lesson details:", error);
       console.log(lessonId);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to load chapters. Please try again.",
-      });
+      setToastType("error");
+      setToastMessage("Failed to load lessons. Please try again.");
       setIsLoading(false);
     }
   };
@@ -80,9 +88,13 @@ const Acquire = () => {
       console.log(updatedData);
       fetchLessonDetails();
       setIsCreating(!isCreating);
+      setToastType("success");
+      setToastMessage("Field created successfully.");
     } catch (error) {
       console.log("Failed to update");
       console.error("Error:", error.response?.data || error.message);
+      setToastType("error");
+      setToastMessage("Field was not created successfully.");
     }
   };
 
@@ -98,9 +110,14 @@ const Acquire = () => {
       console.log("Response data:", response.data);
       console.log(updatedData);
       fetchLessonDetails();
+      setToastType("success");
+      setToastMessage("Field deleted successfully.");
+      setIsDeleting(!isDeleting);
     } catch (error) {
       console.log("Failed to update");
       console.error("Error:", error.response?.data || error.message);
+      setToastType("error");
+      setToastMessage("Failed to delete field. Please try again.");
     }
   };
 
@@ -129,9 +146,13 @@ const Acquire = () => {
       console.log("Response data:", response.data);
       console.log(updatedData);
       fetchLessonDetails();
+      setToastType("success");
+      setToastMessage("Field updated successfully.");
     } catch (error) {
       console.log("Failed to update");
       console.error("Error:", error.response?.data || error.message);
+      setToastType("error");
+      setToastMessage("Failed to update field. Please try again.");
     }
 
     setIsEdit(false);
@@ -188,7 +209,7 @@ const Acquire = () => {
                         <TouchableOpacity className="bg-white px-3 py-1 border border-white rounded-xl">
                           <Text
                             className="text-red-500 text-semibold"
-                            onPress={() => deleteField(index)}
+                            onPress={() => handleDeleting(index)}
                           >
                             Delete
                           </Text>
@@ -310,6 +331,29 @@ const Acquire = () => {
           </View>
         </View>
       )}
+      {isDeleting && (
+        <View className="absolute transition ease-in h-screen w-[100%] flex items-center justify-center bg-black/70">
+          <View className="bg-gray-100 h-fit py-6 w-[90%] border flex items-center justify-center rounded-xl space-y-5 border-white px-4">
+            <Text className="font-bold text-center py-3 text-xl">
+              Are you sure you want to delete this Field?
+            </Text>
+
+            <TouchableOpacity
+              onPress={() => deleteField(id)}
+              className="bg-[#F56E00] py-3 mt-4 w-full flex border-[#F56E00] items-center justify-center border rounded-3xl"
+            >
+              <Text className="text-white font-bold text-xl">Delete</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setIsDeleting(!isDeleting)}
+              className="bg-white py-3 mt-4 w-full flex border-red-700  items-center justify-center border rounded-3xl"
+            >
+              <Text className="text-red-700 font-bold text-xl">Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+      {toastMessage && <Toast type={toastType} message={toastMessage} />}
     </CustomSafeAreaView>
   );
 };

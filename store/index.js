@@ -9,7 +9,15 @@ const useStore = create((set) => ({
 
   userRole: "",
   setUserRole: (payload) => set({ userRole: payload }),
+
+  adminEmail: "",
+  setAdminRole: (payload) => set({ adminEmail: payload }),
+
+  refreshToken: "",
+  setRefreshToken: (payload) => set({ refreshToken: payload }),
+
+  proficiency_Id: "",
+  setProficiencyId: (payload) => set({ proficiencyId: payload }),
 }));
 
 export default useStore;
-``;

@@ -92,8 +92,8 @@ const Cube = ({ subjects }) => {
   return (
     <View style={styles.container}>
       <Canvas style={styles.canvas}>
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[5, 5, 5]} intensity={1} />
+        <ambientLight intensity={1.5} />
+        <directionalLight position={[5, 5, 5]} intensity={1.5} />
         <OrbitControls
           enableZoom={false}
           enablePan={false}

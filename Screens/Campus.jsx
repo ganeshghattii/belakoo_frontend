@@ -22,11 +22,12 @@ import HeadingComponent from "../Components/TextComponents/HeadingComponent";
 import CustomSafeAreaView from "../Components/CustomSafeAreaView";
 import CustomHeader from "../Components/CustomHeader";
 import api from "../services/api";
-import Toast from "react-native-toast-message";
+import Toast from "../Components/Toast";
 
 import useStore from "../store";
 
 import { AntDesign } from "@expo/vector-icons";
+import { set } from "react-hook-form";
 
 const Campus = () => {
   const [campuses, setCampuses] = useState([]);
@@ -39,18 +40,37 @@ const Campus = () => {
 
   const [isEditing, setIsEditing] = useState();
   const [isCreating, setIsCreating] = useState();
+  const [isDeleting, setIsDeleting] = useState();
   const [id, setId] = useState();
 
   const [campus_code, setCampusCode] = useState();
   const [name, setName] = useState();
   const [description, setDescription] = useState();
 
+  const [toastType, setToastType] = useState();
+  const [toastMessage, setToastMessage] = useState();
+
   useEffect(() => {
     fetchCampuses();
   }, []);
 
-  const handleEditing = (id) => {
+  const handleDeleting = (id) => {
+    setIsDeleting(true);
+    setId(id);
+  };
+
+  const handleCreating = () => {
+    setIsCreating(true);
+    setCampusCode("");
+    setName("");
+    setDescription("");
+  };
+
+  const handleEditing = (id, code, name, description) => {
     setIsEditing(true);
+    setCampusCode(code);
+    setName(name);
+    setDescription(description);
     setId(id);
   };
 
@@ -58,7 +78,6 @@ const Campus = () => {
     try {
       const response = await api.get("/api/campuses/");
       setCampuses(response.data);
-      console.log(isAdmin);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching campuses:", error);
@@ -79,20 +98,23 @@ const Campus = () => {
         description,
       };
       console.log(formData);
-
       const response = api.post("/admin-api/campus/", formData);
       setIsEditing(false);
+      setCampusCode("");
+      setName("");
       setIsCreating(false);
       console.log(response.data);
+
+      setToastType("success");
+      setToastMessage("Campus created successfully.");
+
       fetchCampuses();
       console.log(formData);
     } catch (error) {
       console.error("Error creating campus:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to create campus. Please try again.",
-      });
+      setToastType("error");
+      setToastMessage("Campus was not created successfully.");
+
       setIsLoading(false);
     }
   };
@@ -110,14 +132,13 @@ const Campus = () => {
       setIsEditing(false);
       console.log(response.data);
       fetchCampuses();
+      setToastType("success");
+      setToastMessage("Campus updated successfully.");
       console.log(formData);
     } catch (error) {
       console.error("Error updating campus:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to update campus. Please try again.",
-      });
+      setToastType("error");
+      setToastMessage("Failed to update campus. Please try again.");
       setIsLoading(false);
     }
   };
@@ -127,14 +148,14 @@ const Campus = () => {
       console.log(id);
       const response = api.delete(`/admin-api/campus/${id}/`);
       console.log(response.data);
+      setIsDeleting(false);
+      setToastType("success");
+      setToastMessage("Campus deleted successfully.");
       fetchCampuses();
     } catch (error) {
       console.error("Error deleting Campus:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to delete campus. Please try again.",
-      });
+      setToastType("error");
+      setToastMessage("Failed to delete campus. Please try again.");
       setIsLoading(false);
     }
   };
@@ -178,7 +199,7 @@ const Campus = () => {
                   </TouchableOpacity>
                 </Link>
                 <TouchableOpacity
-                  onPress={() => setIsCreating(!isEditing)}
+                  onPress={() => handleCreating()}
                   className="bg-[#F56E00] mt-2 text-sm flex items-center border rounded-lg border-[#F56E00] justify-center w-48 h-16"
                 >
                   <Text className="text-white font-bold text-lg">
@@ -204,11 +225,18 @@ const Campus = () => {
                       }}
                       asChild
                     >
-                      <TouchableOpacity className="bg-white rounded-xl shadow-xl border border-white w-[45%] h-[95%] items-center justify-center">
+                      <TouchableOpacity className="bg-white rounded-xl shadow-xl border border-white w-[45%] py-16 items-center justify-center">
                         {isAdmin && (
                           <TouchableOpacity
                             className="absolute z-10 right-12 top-5"
-                            onPress={() => handleEditing(campus.id)}
+                            onPress={() =>
+                              handleEditing(
+                                campus.id,
+                                campus.campus_code,
+                                campus.name,
+                                campus.description
+                              )
+                            }
                           >
                             <Icon2 name="edit" size={20} color="blue" />
                           </TouchableOpacity>
@@ -216,7 +244,7 @@ const Campus = () => {
                         {isAdmin && (
                           <TouchableOpacity
                             className="absolute z-10 right-4 top-5"
-                            onPress={() => deleteCampus(campus.id)}
+                            onPress={() => handleDeleting(campus.id)}
                           >
                             <Icon name="delete" size={18} color="red" />
                           </TouchableOpacity>
@@ -334,6 +362,29 @@ const Campus = () => {
             </View>
           </View>
         )}
+        {isDeleting && (
+          <View className="absolute transition ease-in h-screen w-[100%] flex items-center justify-center bg-black/70">
+            <View className="bg-gray-100 h-fit py-6 w-[90%] border flex items-center justify-center rounded-xl space-y-5 border-white px-4">
+              <Text className="font-bold text-center py-3 text-xl">
+                Are you sure you want to delete this Campus?
+              </Text>
+
+              <TouchableOpacity
+                onPress={() => deleteCampus(id)}
+                className="bg-[#F56E00] py-3 mt-4 w-full flex border-[#F56E00] items-center justify-center border rounded-3xl"
+              >
+                <Text className="text-white font-bold text-xl">Delete</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setIsDeleting(!isDeleting)}
+                className="bg-white py-3 mt-4 w-full flex border-red-700  items-center justify-center border rounded-3xl"
+              >
+                <Text className="text-red-700 font-bold text-xl">Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+        {toastMessage && <Toast type={toastType} message={toastMessage} />}
       </View>
     </CustomSafeAreaView>
   );

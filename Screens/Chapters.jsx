@@ -25,7 +25,7 @@ import Icon2 from "react-native-vector-icons/FontAwesome";
 import useStore from "../store";
 
 const Chapters = () => {
-  const { proficiencyId, proficiencyName, subjectId } = useLocalSearchParams();
+  const { proficiencyName, subjectId } = useLocalSearchParams();
   const router = useRouter();
   const [chapters, setChapters] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,7 +39,7 @@ const Chapters = () => {
 
   const { grade } = useStore();
 
-  const { userRole } = useStore();
+  const { userRole, proficiencyId } = useStore();
 
   const isAdmin = userRole === "ADMIN";
 
@@ -51,6 +51,7 @@ const Chapters = () => {
   }, []);
 
   const fetchGradeDetails = async () => {
+    console.log(proficiencyId);
     try {
       const response = await api.get(
         `/api/proficiencies/${proficiencyId}/lessons/`
@@ -153,7 +154,7 @@ const Chapters = () => {
               className="bg-[#F56E00] mt-5 text-sm flex items-center border rounded-lg border-[#F56E00] justify-center w-64 h-16"
             >
               <Text className="text-white font-bold text-lg">
-                Create New Lesson
+                Add New Lesson
               </Text>
             </TouchableOpacity>
           </View>
@@ -163,7 +164,7 @@ const Chapters = () => {
           <View className="absolute transition ease-in h-screen w-[100%] flex items-center justify-center bg-black/70">
             <View className="bg-gray-100 h-fit py-6 w-[90%] border flex items-center justify-center rounded-xl space-y-5 border-white px-4">
               <Text className="font-bold text-center py-3 text-xl">
-                Create a New Lesson
+                Add a New Lesson
               </Text>
               <TextInput
                 placeholder="enter your lesson code."

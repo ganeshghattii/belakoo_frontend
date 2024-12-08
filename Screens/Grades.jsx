@@ -214,55 +214,65 @@ const Grades = () => {
                   className="bg-white border mt-5 rounded-lg border-white h-36"
                   showsVerticalScrollIndicator={false}
                 >
-                  {grades.map((grade, index) => (
-                    <Link
-                      key={index}
-                      href={{
-                        pathname: "/subjects",
-                        params: { gradeId: grade.id },
-                      }}
-                      asChild
-                    >
-                      <TouchableOpacity>
-                        <View className="flex items-center flex-row px-4">
-                          {isAdmin && (
-                            <View className="flex flex-row items-center justify-center gap-4">
-                              <TouchableOpacity>
-                                <Icon
-                                  name="delete"
-                                  size={24}
-                                  color="red"
-                                  className="absolute p-5"
-                                  onPress={() => handleDeleting(grade.id)}
-                                />
-                              </TouchableOpacity>
+                  {grades.length === 0 ? (
+                    <View className="flex items-center flex-row px-4">
+                      <View className="bg-white text-center border-b border-b-black/10 mb-2 w-64 h-16 flex-row  flex items-center justify-center rounded-xl">
+                        <Text className="text-lg">No Grades Available</Text>
+                      </View>
+                    </View>
+                  ) : (
+                    <View>
+                      {grades.map((grade, index) => (
+                        <Link
+                          key={index}
+                          href={{
+                            pathname: "/subjects",
+                            params: { gradeId: grade.id },
+                          }}
+                          asChild
+                        >
+                          <TouchableOpacity>
+                            <View className="flex flex-row items-center justify-center ">
+                              {isAdmin && (
+                                <View className="flex flex-row items-center justify-center gap-4 pl-2">
+                                  <TouchableOpacity>
+                                    <Icon
+                                      name="delete"
+                                      size={24}
+                                      color="red"
+                                      className="absolute p-5"
+                                      onPress={() => handleDeleting(grade.id)}
+                                    />
+                                  </TouchableOpacity>
+                                  <TouchableOpacity
+                                    onPress={() =>
+                                      handleEditing(
+                                        grade.id,
+                                        grade.grade_code,
+                                        grade.name
+                                      )
+                                    }
+                                  >
+                                    <Icon2 name="edit" size={24} color="blue" />
+                                  </TouchableOpacity>
+                                </View>
+                              )}
+
                               <TouchableOpacity
-                                onPress={() =>
-                                  handleEditing(
-                                    grade.id,
-                                    grade.grade_code,
-                                    grade.name
-                                  )
-                                }
+                                key={grade.id}
+                                onPress={() => handleNavigation(grade.id)}
+                                className="bg-white border-b border-b-black/10 mb-2 w-64 h-16 flex-row  flex items-center justify-center rounded-xl"
                               >
-                                <Icon2 name="edit" size={24} color="blue" />
+                                <Text className="text-black font-semibold text-2xl">
+                                  {grade.name}
+                                </Text>
                               </TouchableOpacity>
                             </View>
-                          )}
-
-                          <TouchableOpacity
-                            key={grade.id}
-                            onPress={() => handleNavigation(grade.id)}
-                            className="bg-white border-b border-b-black/10 mb-2 w-64 h-16 flex-row  flex items-center justify-center rounded-xl"
-                          >
-                            <Text className="text-black font-semibold text-2xl">
-                              {grade.name}
-                            </Text>
                           </TouchableOpacity>
-                        </View>
-                      </TouchableOpacity>
-                    </Link>
-                  ))}
+                        </Link>
+                      ))}
+                    </View>
+                  )}
                 </ScrollView>
               )}
               {isAdmin && (
@@ -271,7 +281,7 @@ const Grades = () => {
                   className="bg-[#F56E00] mt-5 text-sm flex items-center border rounded-lg border-[#F56E00] justify-center w-64 h-16"
                 >
                   <Text className="text-white font-bold text-lg">
-                    Create New Grade
+                    Add New Grade
                   </Text>
                 </TouchableOpacity>
               )}
@@ -283,7 +293,7 @@ const Grades = () => {
         <View className="absolute transition ease-in h-screen w-[100%] flex items-center justify-center bg-black/70">
           <View className="bg-gray-100 h-fit py-6 w-[90%] border flex items-center justify-center rounded-xl space-y-5 border-white px-4">
             <Text className="font-bold text-center py-3 text-xl">
-              Create a New Grade
+              Add a New Grade
             </Text>
             <TextInput
               placeholder="enter your gradecode."

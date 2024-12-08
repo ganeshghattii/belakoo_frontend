@@ -80,11 +80,11 @@ const Admin = () => {
       fetchVolunteer();
       console.log(formData);
       setToastType("success");
-      setToastMessage("Grade created successfully.");
+      setToastMessage("Volunteer created successfully.");
     } catch (error) {
       console.error("Error creating volunteer:", error);
       setToastType("error");
-      setToastMessage("Grade was not created successfully.");
+      setToastMessage("Volunteer was not created successfully.");
       setIsLoading(false);
     }
   };
@@ -198,7 +198,7 @@ const Admin = () => {
           </View>
 
           <View className="h-screen pt-4 pb-20 px-4">
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView>
               <Text className="text-2xl px-3 font-semibold text-[#F56E00]">
                 Welcome Admin !
               </Text>
@@ -212,52 +212,49 @@ const Admin = () => {
                   authority of Belakoo.
                 </Text>
                 <View className="w-full border border-gray-300"></View>
-                <ScrollView className="h-96">
-                  {volunteer?.map((item, index) => (
-                    <View
-                      key={index}
-                      className="bg-gray-100 my-2 p-4 border border-gray-100 rounded-xl"
-                    >
-                      <TouchableOpacity
-                        onPress={() => handleDeleting(item.id)}
-                        className="absolute z-10 right-4 top-5 border-red-700 border rounded-md "
+                <View className="h-96">
+                  <ScrollView
+                    nestedScrollEnabled={true}
+                    showsVerticalScrollIndicator={false}
+                  >
+                    {volunteer?.map((item, index) => (
+                      <View
+                        key={index}
+                        className="bg-gray-100 my-2 p-4 border border-gray-100 rounded-xl"
                       >
-                        <Text className="text-center text-sm font-bold p-1 text-red-700">
-                          <Icon
-                            name="delete"
-                            size={20}
-                            color="#B91C1C"
-                            className="absolute p-5"
-                          />
+                        <TouchableOpacity
+                          onPress={() => handleDeleting(item.id)}
+                          className="absolute z-10 right-4 top-5 border-red-700 border rounded-md "
+                        >
+                          <Text className="text-center text-sm font-bold p-1 text-red-700">
+                            <Icon
+                              name="delete"
+                              size={20}
+                              color="#B91C1C"
+                              className="absolute p-5"
+                            />
+                          </Text>
+                        </TouchableOpacity>
+                        <Text className="text-lg font-semibold capitalize">
+                          {item.name}
                         </Text>
-                      </TouchableOpacity>
-                      <Text className="text-lg font-semibold capitalize">
-                        {item.name}
-                      </Text>
-                      <Text className="text-sm font-medium text-gray-600">
-                        Email : {item.email}
-                      </Text>
-                      <Text className="text-sm font-medium text-gray-600">
-                        Active : {item.is_active === true ? "True" : "False"}
-                      </Text>
-
-                      {/* <View className="mt-2 w-full border border-gray-300"></View> */}
-                      {/* <Text className="mt-2 font-medium text-green-600">
-                        Completed : {item.chaptersCompleted}
-                      </Text>
-                      <Text className="mt-2 font-medium text-yellow-600">
-                        Pending Approval : {item.chaptersPendingApproval}
-                      </Text> */}
-                    </View>
-                  ))}
-                </ScrollView>
+                        <Text className="text-sm font-medium text-gray-600">
+                          Email : {item.email}
+                        </Text>
+                        <Text className="text-sm font-medium text-gray-600">
+                          Active : {item.is_active === true ? "True" : "False"}
+                        </Text>
+                      </View>
+                    ))}
+                  </ScrollView>
+                </View>
 
                 <TouchableOpacity
                   onPress={() => setIsEditing(!isEditing)}
                   className="bg-[#F56E00] py-4 mt-4 mx-3  flex border-[#F56E00] items-center justify-center border rounded-3xl"
                 >
                   <Text className="text-white font-bold text-xl">
-                    Create a Volunteer
+                    Add a Volunteer
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -270,7 +267,11 @@ const Admin = () => {
                     </Text>
                   </View>
                 ) : (
-                  <View>
+                  <ScrollView
+                    nestedScrollEnabled={true}
+                    showsVerticalScrollIndicator={false}
+                    className="h-96"
+                  >
                     {unverifiedLessons?.map((item, index) => (
                       <View
                         className="bg-gray-200 p-5 rounded-xl space-y-1 my-3"
@@ -309,7 +310,7 @@ const Admin = () => {
                         </View>
                       </View>
                     ))}
-                  </View>
+                  </ScrollView>
                 )}
               </View>
             </ScrollView>
@@ -319,7 +320,7 @@ const Admin = () => {
           <View className="absolute transition ease-in h-screen w-[100%] flex items-center justify-center bg-black/70">
             <View className="bg-gray-100 h-fit py-6 w-[90%] border flex items-center justify-center rounded-xl space-y-5 border-white px-4">
               <Text className="font-bold text-center py-3 text-xl">
-                Create a New Volunteer
+                Add a New Volunteer
               </Text>
               <TextInput
                 placeholder="enter your volunteer name."

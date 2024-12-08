@@ -203,7 +203,7 @@ const Campus = () => {
                   className="bg-[#F56E00] mt-2 text-sm flex items-center border rounded-lg border-[#F56E00] justify-center w-48 h-16"
                 >
                   <Text className="text-white font-bold text-lg">
-                    Create a Campus
+                    Add a New Campus
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -268,7 +268,7 @@ const Campus = () => {
           <View className="absolute transition ease-in h-screen w-[100%] flex items-center justify-center bg-black/70">
             <View className="bg-gray-100 h-fit py-6 w-[90%] border flex items-center justify-center rounded-xl space-y-5 border-white px-4">
               <Text className="font-bold text-center py-3 text-xl">
-                Create a New Campus
+                Add a New Campus
               </Text>
               <TextInput
                 placeholder="enter your campus code."

@@ -1,8 +1,16 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet } from "react-native";
 
 const Toast = ({ type, message }) => {
   const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setVisible(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const getToastStyle = () => {
     switch (type) {
@@ -20,12 +28,6 @@ const Toast = ({ type, message }) => {
   return (
     <View style={[styles.toastContainer, getToastStyle()]}>
       <Text style={[styles.message, getToastStyle()]}>{message}</Text>
-      <TouchableOpacity
-        onPress={() => setVisible(false)}
-        style={styles.closeButton}
-      >
-        <Text style={styles.closeButtonText}>✕</Text>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -60,13 +62,6 @@ const styles = StyleSheet.create({
   default: {
     backgroundColor: "#333333",
     color: "#FFFFFF",
-  },
-  closeButton: {
-    marginLeft: 10,
-  },
-  closeButtonText: {
-    fontSize: 16,
-    color: "#000",
   },
 });
 

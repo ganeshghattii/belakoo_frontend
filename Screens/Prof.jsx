@@ -51,6 +51,8 @@ const Prof = () => {
   const [toastType, setToastType] = useState();
   const [toastMessage, setToastMessage] = useState();
 
+  const { setProficiencyId } = useStore();
+
   useEffect(() => {
     fetchProf();
   }, []);
@@ -68,6 +70,8 @@ const Prof = () => {
   };
 
   const handleNavigation = (id, name) => {
+    setProficiencyId(id);
+    console.log(id);
     router.push({
       pathname: "/chapters",
       params: {
@@ -318,7 +322,7 @@ const Prof = () => {
                   className="bg-[#F56E00] mt-5 text-sm flex items-center border rounded-lg border-[#F56E00] justify-center w-64 h-16"
                 >
                   <Text className="text-white font-bold text-lg">
-                    Create New Proficiency
+                    Add New Proficiency
                   </Text>
                 </TouchableOpacity>
               )}
@@ -330,7 +334,7 @@ const Prof = () => {
         <View className="absolute transition ease-in h-screen w-[100%] flex items-center justify-center bg-black/70">
           <View className="bg-gray-100 h-fit py-6 w-[90%] border flex items-center justify-center rounded-xl space-y-5 border-white px-4">
             <Text className="font-bold text-center py-3 text-xl">
-              Create a New Proficiency
+              Add a New Proficiency
             </Text>
             <TextInput
               placeholder="enter your proficiency code."

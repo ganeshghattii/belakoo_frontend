@@ -249,7 +249,7 @@ const Activate = () => {
                     className="bg-[#F56E00] py-4 mt-4 mx-3  flex border-[#F56E00] items-center justify-center border rounded-3xl"
                   >
                     <Text className="text-white font-bold text-lg">
-                      Create New Field
+                      Add New Field
                     </Text>
                   </TouchableOpacity>
                 )}
@@ -263,7 +263,7 @@ const Activate = () => {
         <View className="absolute transition ease-in h-screen w-[100%] flex items-center justify-center bg-black/70">
           <View className="bg-gray-100 h-fit py-6 w-[90%] border flex items-center justify-center rounded-xl space-y-5 border-white px-4">
             <Text className="font-bold text-center py-3 text-xl">
-              Create a New Field
+              Add a New Field
             </Text>
             <TextInput
               placeholder="enter the content title."

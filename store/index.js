@@ -16,7 +16,7 @@ const useStore = create((set) => ({
   refreshToken: "",
   setRefreshToken: (payload) => set({ refreshToken: payload }),
 
-  proficiency_Id: "",
+  proficiencyId: "",
   setProficiencyId: (payload) => set({ proficiencyId: payload }),
 }));
 

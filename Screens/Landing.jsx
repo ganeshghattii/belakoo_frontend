@@ -9,7 +9,6 @@ import {
   Platform,
   Alert,
 } from "react-native";
-import * as Notifications from "expo-notifications";
 import { useRouter } from "expo-router";
 import * as Device from "expo-device";
 import { LinearGradient } from "expo-linear-gradient";

@@ -187,7 +187,10 @@ const Assess = () => {
               style={styles.loader}
             />
           ) : (
-            <ScrollView className="space-y-3 mt-4 h-[89%]">
+            <ScrollView
+              className=" space-y-3 my-4 h-[60%]"
+              showsVerticalScrollIndicator={false}
+            >
               {assessData?.map((item, index) => (
                 <View key={index} className="space-y-4 mx-4">
                   <View className="flex justify-between flex-row items-center">
@@ -219,39 +222,40 @@ const Assess = () => {
                   <Text className="text-lg font-medium">{item.desc}</Text>
                 </View>
               ))}
-
-              <TouchableOpacity
-                onPress={() =>
-                  router.push({
-                    pathname: "/principle",
-                    params: {
-                      lessonCode: lessonCode,
-                      lessonName: lessonName,
-                      lessonId: lessonId,
-                      activate: true,
-                      acquire: true,
-                      apply: true,
-                      assess: true,
-                    },
-                  })
-                }
-                className="bg-[#F56E00] py-4  mx-3 flex border-[#F56E00] items-center justify-center border rounded-3xl"
-              >
-                <Text className="text-white font-bold text-xl">Finish</Text>
-              </TouchableOpacity>
-
-              {isAdmin && (
-                <TouchableOpacity
-                  onPress={() => setIsCreating(!isCreating)}
-                  className="bg-[#F56E00] py-4 mt-4 mx-3  flex border-[#F56E00] items-center justify-center border rounded-3xl"
-                >
-                  <Text className="text-white font-bold text-lg">
-                    Add New Field
-                  </Text>
-                </TouchableOpacity>
-              )}
             </ScrollView>
           )}
+          <View className="bg-transparent">
+            <TouchableOpacity
+              onPress={() =>
+                router.push({
+                  pathname: "/principle",
+                  params: {
+                    lessonCode: lessonCode,
+                    lessonName: lessonName,
+                    lessonId: lessonId,
+                    activate: true,
+                    acquire: true,
+                    apply: true,
+                    assess: true,
+                  },
+                })
+              }
+              className="bg-[#F56E00] mt-10 mb-4 py-4 mx-3  flex border-[#F56E00] items-center justify-center border rounded-3xl"
+            >
+              <Text className="text-white font-bold text-xl">Finish</Text>
+            </TouchableOpacity>
+
+            {isAdmin && (
+              <TouchableOpacity
+                onPress={() => setIsCreating(!isCreating)}
+                className="bg-[#F56E00] py-4 mx-3  flex border-[#F56E00] items-center justify-center border rounded-3xl"
+              >
+                <Text className="text-white font-bold text-lg">
+                  Add New Field
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
           <View></View>
           {isCreating && (
             <View className="absolute transition ease-in h-screen w-[100%] flex items-center justify-center bg-black/70">

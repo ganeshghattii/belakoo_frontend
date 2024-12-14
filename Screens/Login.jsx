@@ -14,38 +14,34 @@ import {
 } from "react-native";
 import { Link, useRouter } from "expo-router";
 import CustomSafeAreaView from "../Components/CustomSafeAreaView";
-import Toast from "react-native-toast-message";
 import authService from "../services/authService";
+
+import Toast from "../Components/Toast";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const [toastType, setToastType] = useState();
+  const [toastMessage, setToastMessage] = useState();
+
   const router = useRouter();
 
   const validateInputs = () => {
     if (!email.trim()) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Please enter your email",
-      });
+      setToastType("error");
+      setToastMessage("Please enter your email");
       return false;
     }
     if (!password.trim()) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Please enter your password",
-      });
+      setToastType("error");
+      setToastMessage("Please enter your password");
       return false;
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Please enter a valid email address",
-      });
+      setToastType("error");
+      setToastMessage("Please enter a valid email address");
       return false;
     }
     return true;
@@ -63,25 +59,18 @@ const Login = () => {
       if (error.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
-        Toast.show({
-          type: "error",
-          text1: "Login Error",
-          text2: error.response.data.msg || "An error occurred during login.",
-        });
+        setToastType("error");
+        setToastMessage(
+          error.response.data.msg || "An error occurred during login."
+        );
       } else if (error.request) {
         // The request was made but no response was received
-        Toast.show({
-          type: "error",
-          text1: "Network Error",
-          text2: "Unable to connect to the server. Please try again.",
-        });
+        setToastType("error");
+        setToastMessage("Unable to connect to the server. Please try again.");
       } else {
         // Something happened in setting up the request that triggered an Error
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "An unexpected error occurred.",
-        });
+        setToastType("error");
+        setToastMessage("An unexpected error occurred");
       }
     } finally {
       setIsLoading(false);
@@ -142,6 +131,7 @@ const Login = () => {
               </TouchableOpacity>
             </View>
           </View>
+          {toastMessage && <Toast type={toastType} message={toastMessage} />}
         </ScrollView>
       </KeyboardAvoidingView>
     </CustomSafeAreaView>

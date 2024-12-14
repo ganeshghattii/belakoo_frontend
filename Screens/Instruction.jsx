@@ -17,18 +17,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
 import useStore from "../store";
 import React, { useEffect, useState } from "react";
-import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import { LinearGradient } from "expo-linear-gradient";
 import api from "../services/api";
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
 
 const InstructionContent = ({ title, description }) => {
   return (
@@ -40,99 +31,6 @@ const InstructionContent = ({ title, description }) => {
 };
 
 const Instruction = () => {
-  const [hasAskedPermission, setHasAskedPermission] = useState(false);
-
-  useEffect(() => {
-    const setupNotifications = async () => {
-      if (!Device.isDevice) {
-        Alert.alert(
-          "Error",
-          "Push notifications only work on a physical device."
-        );
-        return;
-      }
-
-      // Request permissions and get the token
-      const { status: existingStatus } =
-        await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-
-      if (existingStatus !== "granted") {
-        if (!hasAskedPermission) {
-          const { status } = await Notifications.requestPermissionsAsync();
-          finalStatus = status;
-          setHasAskedPermission(true);
-        } else {
-          Alert.alert(
-            "Permission Denied",
-            "Push notifications require permission to function. Please enable it in your settings."
-          );
-          return;
-        }
-      }
-
-      if (finalStatus !== "granted") {
-        Alert.alert(
-          "Permission Denied",
-          "Push notifications require permission to function."
-        );
-        return;
-      }
-
-      // Get Expo push token
-      const tokenData = await Notifications.getExpoPushTokenAsync({
-        projectId: "ff4647f1-1086-4d00-a1dc-66312068abde", // Replace with your projectId
-      });
-      console.log("Notification token:", tokenData.data);
-
-      // If permission is granted, send the token to the backend
-      if (finalStatus === "granted") {
-        try {
-          console.log(tokenData)
-          const response = await api.post(`/user/update-push-token/`, {
-            expo_push_token: tokenData.data,
-          });
-          console.log("Token sent to backend:", response.data);
-        } catch (error) {
-          console.error("Error sending token to backend:", error);
-        }
-      }
-    };
-
-    setupNotifications();
-
-    if (Platform.OS === "android") {
-      Notifications.setNotificationChannelAsync("default", {
-        name: "default",
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: "#FF231F7C",
-      });
-    }
-
-    // Notification listeners
-    const notificationListener = Notifications.addNotificationReceivedListener(
-      (notification) => {
-        console.log("Notification received:", notification);
-      }
-    );
-
-    const responseListener =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        const data = response.notification.request.content.data;
-        if (data.notification_type === "lesson_completion") {
-          console.log("Navigating to lesson details with ID:", data.lesson_id);
-          // Add navigation logic here if needed
-        }
-      });
-
-    // Cleanup listeners on unmount
-    return () => {
-      Notifications.removeNotificationSubscription(notificationListener);
-      Notifications.removeNotificationSubscription(responseListener);
-    };
-  }, [hasAskedPermission]);
-
   const router = useRouter();
   const { setUserRole, userRole } = useStore();
 

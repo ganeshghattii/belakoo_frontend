@@ -28,15 +28,7 @@
     },
     "plugins": [
       "expo-font",
-      "expo-router",
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/customicon.png",
-          "color": "#ffffff",
-          "sounds": ["./assets/notification.wav"]
-        }
-      ]
+      "expo-router"
     ],
     "extra": {
       "router": {

@@ -42,6 +42,7 @@ const Lesson = () => {
   const [outcome, setOutcome] = useState();
   const [behaviourOutcome, setBehaviourOutcome] = useState();
   const [materialRequired, setMaterialRequired] = useState();
+  const [resources, setResources] = useState();
 
   const { setLessonId } = useStore();
 
@@ -63,10 +64,12 @@ const Lesson = () => {
   const fetchLessonDetails = async () => {
     try {
       const response = await api.get(`/api/lessons/${lessonId}/`);
+      console.log(response.data);
       setLessonData(response.data);
       setObjective(response.data.objective);
       setDuration(response.data.duration);
       setLessonId(lessonId);
+      setResources(response.data.resources);
       setOutcome(response.data.specific_learning_outcome);
       setBehaviourOutcome(response.data.behavioral_outcome);
       setMaterialRequired(response.data.materials_required);
@@ -83,6 +86,7 @@ const Lesson = () => {
       const formData = {
         objective,
         duration,
+        resources,
         specific_learning_outcome: outcome,
         behavioral_outcome: behaviourOutcome,
         materials_required: materialRequired,
@@ -226,6 +230,26 @@ const Lesson = () => {
                   />
                 ) : (
                   <Text className="text-lg font-medium">{outcome}</Text>
+                )}
+              </View>
+              <View className="bg-[#FFE4CF] p-5 border border-[#FFE4CF] rounded-3xl space-y-2">
+                <Text className="text-xl font-bold text-[#F56E00]">
+                  Resources
+                </Text>
+                {isEditing ? (
+                  <TextInput
+                    placeholder="enter your learning outcome"
+                    placeholderTextColor="#CCCCCC"
+                    value={resources}
+                    keyboardType="email-address"
+                    clearButtonMode="while-editing"
+                    onChangeText={(text) => setResources(text)}
+                    multiline={true}
+                    autoCapitalize="none"
+                    className="bg-white text-lg p-2 rounded-xl border-[#F56E00] border-2"
+                  />
+                ) : (
+                  <Text className="text-lg font-medium">{resources}</Text>
                 )}
               </View>
               <View className="bg-[#FFE4CF] p-5 border border-[#FFE4CF] rounded-3xl space-y-2">
